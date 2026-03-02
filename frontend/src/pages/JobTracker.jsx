@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
     const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'tracker', 'analytics', 'portals'
@@ -12,31 +13,71 @@ const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
         "Proxy: Rotating to US-East-1 Nodes.",
         "Engine: Matching NLP vectors for global job search..."
     ]);
+    const [jobs, setJobs] = useState([]);
+    const [skillGaps, setSkillGaps] = useState([]);
+    const [trendingData, setTrendingData] = useState({ roles: [], skills: [] });
+    const [loading, setLoading] = useState(true);
 
-    const generateRandomJobs = (query) => {
-        const role = query || "Software Developer";
-        const companies = ['Google', 'Microsoft', 'Amazon', 'Meta', 'Netflix', 'Apple', 'Stripe', 'Airbnb', 'Spotify', 'Uber'];
-        const locations = ['Remote', 'San Francisco, CA', 'New York, NY', 'Seattle, WA', 'Austin, TX', 'London, UK'];
-        const types = ['Direct', 'Partner', 'Internal', 'Official'];
+    const API_URL = `${import.meta.env.VITE_API_URL}/v1/jobs`; // Adjust to env var in production
 
-        return Array.from({ length: 5 }).map((_, i) => ({
-            id: Date.now() + i,
-            title: `Senior ${role.split(' ')[0]} Engineer`,
-            company: companies[Math.floor(Math.random() * companies.length)],
-            location: locations[Math.floor(Math.random() * locations.length)],
-            exp: `${Math.floor(Math.random() * 5) + 1}+ Yrs`,
-            score: Math.floor(Math.random() * 20) + 80, // 80-99
-            type: types[Math.floor(Math.random() * types.length)],
-            time: `${Math.floor(Math.random() * 59) + 1}m ago`,
-            link: '#',
-            domain: 'Software',
-            status: 'New',
-            matchingSkills: [role.split(' ')[0], 'React', 'Node.js', 'Python'].slice(0, 3),
-            missingSkills: ['Go', 'Rust'].slice(0, 1)
-        }));
-    };
+    const axiosInstance = axios.create({
+        baseURL: API_URL,
+        withCredentials: true,
+        headers: {
+            // Need to pass token if using jwt in localStorage
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+    });
 
-    const [jobs, setJobs] = useState(generateRandomJobs(''));
+    // Fetch initial data
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                setLoading(true);
+                // Fetch matches
+                const matchRes = await axiosInstance.get('/matches');
+                const formattedJobs = matchRes.data.data.map(match => ({
+                    id: match.id,
+                    jobId: match.job.id,
+                    title: match.job.jobTitle,
+                    company: match.job.companyName,
+                    location: match.job.location.join(', '),
+                    exp: match.job.experienceRequired || 'N/A',
+                    score: match.relevanceScore,
+                    type: 'Direct',
+                    time: new Date(match.job.postedAt).toLocaleDateString(),
+                    link: match.job.sourceUrl,
+                    domain: match.job.sourceDomain,
+                    status: match.matchStatus,
+                    matchingSkills: match.job.skillsRequired.slice(0, 3) || [],
+                    missingSkills: match.skillGap || []
+                }));
+                setJobs(formattedJobs);
+
+                // Fetch skill gaps
+                const gapsRes = await axiosInstance.get('/analysis/skill-gaps');
+                const gapsArray = Object.keys(gapsRes.data.data).map(key => ({
+                    skill: key,
+                    freq: `In ${gapsRes.data.data[key]} High-Match Jobs`,
+                    impact: `${Math.min(gapsRes.data.data[key] * 10 + 30, 95)}%` // mock impact calculation
+                })).slice(0, 3);
+                setSkillGaps(gapsArray);
+
+                // Fetch trending
+                const trendingRes = await axiosInstance.get('/trending');
+                if (trendingRes.data.success) {
+                    setTrendingData(trendingRes.data.data);
+                }
+            } catch (err) {
+                console.error("Error fetching job data", err);
+                setLogs(prev => [`Error connecting to Job Engine APIs`, ...prev]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDashboardData();
+    }, []);
 
     const categories = ['All', 'Software', 'AI/ML', 'Data Science', 'Core Eng', 'Remote'];
 
@@ -67,7 +108,9 @@ const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
                 setScanProgress(p => {
                     if (p >= 100) {
                         setIsScanning(false);
-                        setJobs(generateRandomJobs(targetRole));
+                        // In reality, this would poll for new jobs or trigger a backend scrape job
+                        // For now we just add a mock log.
+                        setLogs(prev => [`Scan complete. New nodes active.`, ...prev]);
                         setActiveTab('dashboard'); // Force view back to dashboard to see new items
                         return 0;
                     }
@@ -95,10 +138,21 @@ const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
         e.dataTransfer.setData('jobId', id);
     };
 
-    const handleDrop = (e, newStatus) => {
+    const handleDrop = async (e, newStatus) => {
         e.preventDefault();
-        const id = parseInt(e.dataTransfer.getData('jobId'));
+        const id = e.dataTransfer.getData('jobId');
+
+        // Optimistic UI update
+        const previousJobs = [...jobs];
         setJobs(jobs.map(j => j.id === id ? { ...j, status: newStatus } : j));
+
+        try {
+            await axiosInstance.post(`/${id}/apply`, { status: newStatus });
+        } catch (err) {
+            console.error("Failed to update status", err);
+            // Revert on error
+            setJobs(previousJobs);
+        }
     };
 
     const handleDragOver = (e) => {
@@ -386,13 +440,24 @@ const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
                                         <div style={{ display: 'flex', gap: '10px' }}>
                                             <button
                                                 style={{ background: '#F3F4F6', color: '#6B7280', border: '1px solid #E5E7EB', padding: '0.6rem 1rem', borderRadius: '8px', fontWeight: '800', cursor: 'pointer' }}
-                                                onClick={() => setJobs(jobs.map(j => j.id === job.id ? { ...j, status: 'Saved' } : j))}
+                                                onClick={async () => {
+                                                    try {
+                                                        await axiosInstance.post(`/${job.id}/apply`, { status: 'Saved' });
+                                                        setJobs(jobs.map(j => j.id === job.id ? { ...j, status: 'Saved' } : j));
+                                                    } catch (err) { console.error(err); }
+                                                }}
                                             >
                                                 <i className="fa-regular fa-bookmark"></i>
                                             </button>
                                             <button
                                                 style={{ background: '#3B82F6', color: 'white', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-                                                onClick={() => { window.open(job.link, '_blank'); setJobs(jobs.map(j => j.id === job.id ? { ...j, status: 'Applied' } : j)); }}
+                                                onClick={async () => {
+                                                    window.open(job.link, '_blank');
+                                                    try {
+                                                        await axiosInstance.post(`/${job.id}/apply`, { status: 'Applied' });
+                                                        setJobs(jobs.map(j => j.id === job.id ? { ...j, status: 'Applied' } : j));
+                                                    } catch (err) { console.error(err); }
+                                                }}
                                             >
                                                 APPLY <i className="fa-solid fa-external-link" style={{ fontSize: '0.8rem' }}></i>
                                             </button>
@@ -467,7 +532,7 @@ const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
                             <i className="fa-solid fa-triangle-exclamation" style={{ color: '#F59E0B' }}></i> CRITICAL SKILL GAPS
                         </h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            {[{ skill: 'Go (Golang)', freq: 'In 45 High-Match Jobs', impact: '85%' }, { skill: 'Kafka', freq: 'In 32 High-Match Jobs', impact: '60%' }, { skill: 'GraphQL', freq: 'In 28 High-Match Jobs', impact: '45%' }].map(gap => (
+                            {skillGaps.length > 0 ? skillGaps.map(gap => (
                                 <div key={gap.skill} style={{ background: '#F9FAFB', padding: '1rem', borderRadius: '12px', border: '1px solid #E5E7EB' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                                         <h4 style={{ margin: 0, fontSize: '1.1rem', color: '#EF4444' }}>{gap.skill}</h4>
@@ -480,7 +545,7 @@ const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
                                         <i className="fa-solid fa-play"></i> Auto-Generate Study Plan
                                     </button>
                                 </div>
-                            ))}
+                            )) : <p>No critical skill gaps identified from current matches.</p>}
                         </div>
                     </div>
 
@@ -503,9 +568,10 @@ const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
 
                         <h3 style={{ fontSize: '1.2rem', fontWeight: '900', marginTop: '2.5rem', marginBottom: '1.5rem', color: '#111827' }}>TRENDING DOMAINS</h3>
                         <div style={{ background: '#F8FAFC', borderRadius: '12px', padding: '1.5rem', border: '1px solid #E5E7EB' }}>
-                            <p style={{ margin: '0 0 10px 0', display: 'flex', justifyContent: 'space-between', color: '#7C3AED', fontWeight: 'bold' }}><span>Generative AI</span> <span>+145% this week</span></p>
-                            <p style={{ margin: '0 0 10px 0', display: 'flex', justifyContent: 'space-between', color: '#10B981', fontWeight: 'bold' }}><span>Cloud Architecture</span> <span>+80% this week</span></p>
-                            <p style={{ margin: '0 0 0 0', display: 'flex', justifyContent: 'space-between', color: '#3B82F6', fontWeight: 'bold' }}><span>Frontend (React)</span> <span>Stable</span></p>
+                            {trendingData.roles.map((role, i) => (
+                                <p key={i} style={{ margin: i === trendingData.roles.length - 1 ? '0' : '0 0 10px 0', display: 'flex', justifyContent: 'space-between', color: i === 0 ? '#7C3AED' : i === 1 ? '#10B981' : '#3B82F6', fontWeight: 'bold' }}><span>{role.title}</span> <span>{role.growth}</span></p>
+                            ))}
+                            {trendingData.roles.length === 0 && <p>Loading trends...</p>}
                         </div>
                     </div>
                 </motion.div>

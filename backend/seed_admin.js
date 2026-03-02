@@ -1,31 +1,41 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
-const User = require('./models/User');
+const prisma = require('./prismaClient');
+const bcrypt = require('bcryptjs');
 
 const seedAdmin = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('MongoDB Connected to seed admin...');
+        console.log('Seeding admin user to PostgreSQL via Prisma...');
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash('admin123', salt);
 
         // Check if admin exists
-        let admin = await User.findOne({ email: 'admin@admin.com' });
+        const admin = await prisma.user.findUnique({
+            where: { email: 'admin@admin.com' }
+        });
 
         if (admin) {
-            console.log('Admin user already exists. Updating password...');
-            // Need to change password and trigger pre-save hook
-            admin.password = 'admin123';
-            await admin.save();
+            console.log('Admin user already exists. Updating...');
+            await prisma.user.update({
+                where: { email: 'admin@admin.com' },
+                data: {
+                    password: hashedPassword,
+                    role: 'admin'
+                }
+            });
         } else {
             console.log('Creating admin user...');
-            await User.create({
-                name: 'Admin User',
-                email: 'admin@admin.com',
-                password: 'admin123',
-                role: 'admin'
+            await prisma.user.create({
+                data: {
+                    name: 'Admin User',
+                    email: 'admin@admin.com',
+                    password: hashedPassword,
+                    role: 'admin'
+                }
             });
         }
 
-        console.log('Admin seeded successfully! Login with Email: admin (or admin@admin.com) and Password: admin123');
+        console.log('Admin seeded successfully! Login with Email: admin@admin.com and Password: admin123');
         process.exit();
     } catch (err) {
         console.error(err);
@@ -34,3 +44,4 @@ const seedAdmin = async () => {
 };
 
 seedAdmin();
+

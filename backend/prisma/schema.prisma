@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                      String   @id @default(uuid())
+  name                    String
+  email                   String   @unique
+  password                String
+  role                    String   @default("user")
+  phone                   String?
+  department              String?
+  experienceLevel         String?
+  preferredRole           String[]
+  skills                  String[]
+  preferredLocation       String[]
+  notificationEmail       Boolean  @default(true)
+  notificationWhatsapp    Boolean  @default(true)
+  minScoreThreshold       Int      @default(80)
+  xp                      Int      @default(0)
+  level                   Int      @default(1)
+  coins                   Int      @default(0)
+  createdAt               DateTime @default(now())
+
+  jobMatches              JobMatch[]
+  commSessions            CommunicationSession[]
+  habits                  Habit[]
+  testResults             TestResult[]
+  resumes                 Resume[]
+}
+
+model Job {
+  id                 String     @id @default(uuid())
+  sourceUrl          String     @unique
+  sourceDomain       String
+  companyName        String
+  jobTitle           String
+  location           String[]
+  experienceRequired String?
+  skillsRequired     String[]
+  rawDescription     String?
+  postedAt           DateTime?
+  discoveredAt       DateTime   @default(now())
+  isDuplicate        Boolean    @default(false)
+
+  matches            JobMatch[]
+}
+
+model JobMatch {
+  id             String    @id @default(uuid())
+  userId         String
+  jobId          String
+  relevanceScore Float
+  matchStatus    String    @default("New")
+  skillGap       String[]
+  notified       Boolean   @default(false)
+  notifiedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  user           User      @relation(fields: [userId], references: [id])
+  job            Job       @relation(fields: [jobId], references: [id])
+}
+
+model CommunicationSession {
+  id              String   @id @default(uuid())
+  userId          String
+  topic           String
+  fluencyWpm      Int?
+  grammarScore    Float?
+  vocabComplexity String?
+  confidenceIndex Float?
+  history         Json?     
+  finalCefrLevel  String?
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id])
+}
+
+model Habit {
+  id                String   @id @default(uuid())
+  userId            String
+  title             String
+  category          String
+  frequency         String
+  streak            Int      @default(0)
+  completedToday    Boolean  @default(false)
+  totalDone         Int      @default(0)
+  target            Int      @default(30)
+  xpPerCompletion   Int      @default(30)
+  color             String?
+  reminder          String?
+  lastCompletedAt   DateTime?
+  createdAt         DateTime @default(now())
+
+  user              User     @relation(fields: [userId], references: [id])
+}
+
+model TestResult {
+  id              String   @id @default(uuid())
+  userId          String
+  type            String   // 'Quiz' or 'CodingChallenge'
+  topic           String
+  score           Int?     // For quizzes
+  totalQuestions  Int?     // For quizzes
+  passed          Boolean? // For coding challenges
+  feedback        String?  // For coding challenges
+  codeSubmitted   String?  // For coding challenges
+  createdAt       DateTime @default(now())
+
+  user            User     @relation(fields: [userId], references: [id])
+}
+
+model Resume {
+  id              String   @id @default(uuid())
+  userId          String
+  name            String
+  template        String   @default("modern")
+  content         Json     // Store the generated resume data
+  atsScore        Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id])
+}

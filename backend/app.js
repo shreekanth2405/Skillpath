@@ -2,11 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const xss = require('xss-clean');
-const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
+const prisma = require('./prismaClient');
 
 const app = express();
+
 
 // Set security headers
 app.use(helmet());
@@ -20,9 +21,6 @@ app.use(cors({
 // Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
 
 // Data sanitization against XSS
 app.use(xss());
@@ -39,15 +37,35 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // Base Route
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'success', message: 'API is running' });
+app.get('/api/health', async (req, res) => {
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        res.status(200).json({
+            status: 'success',
+            message: 'API is running',
+            database: 'Connected (PostgreSQL)'
+        });
+    } catch (error) {
+        console.error('Health check database error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'API is running',
+            database: 'Disconnected',
+            error: error.message
+        });
+    }
 });
+
 
 // To be imported: 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/v1/jobs', require('./routes/jobRoutes'));
+app.use('/api/v1/habits', require('./routes/habitRoutes'));
+app.use('/api/v1/communication', require('./routes/communicationRoutes'));
+app.use('/api/v1/test-system', require('./routes/testSystemRoutes'));
+app.use('/api/v1/resumes', require('./routes/resumeRoutes'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {
@@ -61,3 +79,4 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
+

@@ -13,7 +13,7 @@ const Register = ({ setAuth }) => {
         e.preventDefault();
         if (name && email && password && password === confirm) {
             try {
-                const res = await fetch('http://localhost:5000/api/auth/register', {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password })
@@ -31,7 +31,7 @@ const Register = ({ setAuth }) => {
                 }
             } catch (err) {
                 console.error('Registration error:', err);
-                alert('Could not connect to the server!');
+                alert('Could not connect to the server. Make sure the backend is running.');
             }
         } else if (password !== confirm) {
             alert('Passwords do not match');
@@ -46,7 +46,7 @@ const Register = ({ setAuth }) => {
                         <i className="fa-solid fa-user-plus"></i>
                     </div>
                     <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#0f172a', marginBottom: '0.5rem' }}>Create Account</h1>
-                    <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Start your AI-powered learning journey.</p>
+                    <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Join SkillPath today.</p>
                 </div>
 
                 <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -60,7 +60,7 @@ const Register = ({ setAuth }) => {
                     </div>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.5rem' }}>Password</label>
-                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%', padding: '0.9rem 1rem', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '1rem', outline: 'none', transition: '0.2s' }} onFocus={e => e.target.style.borderColor = '#3b82f6'} onBlur={e => e.target.style.borderColor = '#cbd5e1'} required pattern=".{8,}" title="8 characters minimum" />
+                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%', padding: '0.9rem 1rem', borderRadius: '12px', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '1rem', outline: 'none', transition: '0.2s' }} onFocus={e => e.target.style.borderColor = '#3b82f6'} onBlur={e => e.target.style.borderColor = '#cbd5e1'} required />
                     </div>
                     <div>
                         <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.5rem' }}>Confirm Password</label>
@@ -70,27 +70,6 @@ const Register = ({ setAuth }) => {
                         Get Started
                     </button>
                 </form>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '2rem 0' }}>
-                    <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
-                    <span style={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 600 }}>OR REGISTER WITH</span>
-                    <div style={{ flex: 1, height: '1px', background: '#e2e8f0' }}></div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
-                    <button style={{ padding: '0.75rem', background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '1.2rem', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: '0.2s' }} onMouseOver={e => e.target.style.background = '#f8fafc'} onMouseOut={e => e.target.style.background = 'white'}>
-                        <i className="fa-brands fa-google" style={{ color: '#ea4335' }}></i>
-                    </button>
-                    <button style={{ padding: '0.75rem', background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '1.2rem', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: '0.2s' }} onMouseOver={e => e.target.style.background = '#f8fafc'} onMouseOut={e => e.target.style.background = 'white'}>
-                        <i className="fa-brands fa-github"></i>
-                    </button>
-                    <button style={{ padding: '0.75rem', background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '1.2rem', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: '0.2s' }} onMouseOver={e => e.target.style.background = '#f8fafc'} onMouseOut={e => e.target.style.background = 'white'}>
-                        <i className="fa-brands fa-microsoft" style={{ color: '#00a4ef' }}></i>
-                    </button>
-                    <button style={{ padding: '0.75rem', background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '1.2rem', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: '0.2s' }} onMouseOver={e => e.target.style.background = '#f8fafc'} onMouseOut={e => e.target.style.background = 'white'}>
-                        <i className="fa-solid fa-phone" style={{ color: '#10b981' }}></i>
-                    </button>
-                </div>
 
                 <p style={{ textAlign: 'center', marginTop: '1.5rem', color: '#64748b', fontSize: '0.9rem' }}>
                     Already have an account? <span onClick={() => navigate('/login')} style={{ color: '#3b82f6', fontWeight: 700, cursor: 'pointer' }}>Log in</span>

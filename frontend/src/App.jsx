@@ -66,10 +66,50 @@ function MainApp() {
     return localStorage.getItem('auth') === 'true';
   });
 
+  // Gamification Global State
+  const [user, setUser] = useState(null);
+  const [userXP, setUserXP] = useState(0);
+  const [userLevel, setUserLevel] = useState(1);
+  const [userCoins, setUserCoins] = useState(0);
+
   useEffect(() => {
     if (isAuthenticated) {
       localStorage.setItem('auth', 'true');
+    } else {
+      localStorage.removeItem('auth');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
+  }, [isAuthenticated]);
+
+  // SYNC USER DATA FROM BACKEND
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('token');
+
+      if (token && isAuthenticated) {
+        try {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/users/profile`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          const data = await res.json();
+          if (data.success) {
+            const userData = data.data;
+            setUser(userData);
+            setUserXP(userData.xp || 0);
+            setUserLevel(userData.level || 1);
+            setUserCoins(userData.coins || 0);
+            localStorage.setItem('user', JSON.stringify(userData));
+          }
+        } catch (err) {
+          console.error("Failed to fetch user profile", err);
+        }
+      }
+    };
+
+    fetchUserData();
   }, [isAuthenticated]);
 
   const activeTab = location.pathname.substring(1) || 'dashboard';
@@ -83,11 +123,6 @@ function MainApp() {
   const [isTyping, setIsTyping] = useState(false);
   const chatBottomRef = useRef(null);
 
-  // Gamification Global State
-  const [userXP, setUserXP] = useState(2450);
-  const [userLevel, setUserLevel] = useState(3);
-  const [userCoins, setUserCoins] = useState(1500);
-
   // RAG Context Reference
   const knowledgeBaseRef = useRef("");
   const [isUploading, setIsUploading] = useState(false);
@@ -100,134 +135,69 @@ function MainApp() {
     }
   ]);
 
-  // Persistent Google Generative AI Session Chat reference
-  const chatInstance = useRef(null);
-
-  useEffect(() => {
-    // Initialize the Gemini Chat Session
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      systemInstruction: skillPathSystemInstruction,
-    });
-    chatInstance.current = model.startChat({
-      history: [],
-    });
-  }, []);
-
-  const scrollToBottom = () => {
-    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [chatLog]);
-
-  const recognitionRef = useRef(null);
-  const synthesisRef = useRef(window.speechSynthesis);
-
-  const handleVoiceToggle = () => {
-    if (isRecording) {
-      recognitionRef.current?.stop();
-      setIsRecording(false);
-      return;
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert("Speech Recognition not supported in this browser.");
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.interimResults = true;
-
-    recognition.onstart = () => {
-      setIsRecording(true);
-    };
-
-    recognition.onresult = (event) => {
-      const transcript = Array.from(event.results)
-        .map(result => result[0])
-        .map(result => result.transcript)
-        .join('');
-      setInputText(transcript);
-    };
-
-    recognition.onend = () => {
-      setIsRecording(false);
-      if (inputText.trim()) {
-        handleQuerySubmit(inputText);
-        setInputText("");
-      }
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-  };
-
-  const speak = (text) => {
-    if (!synthesisRef.current) return;
-    synthesisRef.current.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    const voices = synthesisRef.current.getVoices();
-    // Prefer Assistant 5 / Premium voices
-    const voice = voices.find(v => v.name.includes("Natural") || v.name.includes("Premium") || v.name.includes("Google US English"));
-    if (voice) utterance.voice = voice;
-    synthesisRef.current.speak(utterance);
-  };
-
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setIsUploading(true);
     const reader = new FileReader();
-    reader.onload = (evt) => {
-      knowledgeBaseRef.current = evt.target.result;
-      setChatLog(prev => [...prev, {
-        type: 'ai',
-        content: `**Knowledge Base Loaded!** I have ingested \`${file.name}\`. It is now active in my RAG context context. You can now prompt me questions about it.`
-      }]);
+    reader.onload = (event) => {
+      knowledgeBaseRef.current = event.target.result;
       setIsUploading(false);
+      alert("Knowledge Base Updated! AI will now prioritize this context.");
     };
     reader.readAsText(file);
-    e.target.value = '';
-  }
-
-  const handleSend = () => {
-    if (!inputText.trim()) return;
-    handleQuerySubmit(inputText);
-    setInputText('');
   };
 
-  const handleQuerySubmit = async (queryText) => {
-    const userMsg = { type: 'user', content: queryText };
-    setChatLog(prev => [...prev, userMsg]);
-    setIsTyping(true);
-
-    // Auto-navigate to chatbot if querying from another page
-    if (activeTab !== 'chatbot') {
-      setActiveTab('chatbot');
+  const handleVoiceToggle = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice recognition not supported in this browser.");
+      return;
     }
 
-    try {
-      let prompt = queryText;
-      if (knowledgeBaseRef.current) {
-        prompt = `[SYSTEM NOTE: The user has provided an explicit Knowledge Base. Use this knowledge to answer the question if applicable:\n\nKNOWLEDGE BASE CONTEXT:\n${knowledgeBaseRef.current}\n\n]\n\nUser Question:\n${queryText}`;
-      }
+    if (isRecording) {
+      setIsRecording(false);
+    } else {
+      setIsRecording(true);
+      const recognition = new SpeechRecognition();
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInputText(transcript);
+        setIsRecording(false);
+      };
+      recognition.onerror = () => setIsRecording(false);
+      recognition.onend = () => setIsRecording(false);
+      recognition.start();
+    }
+  };
 
-      const result = await chatInstance.current.sendMessage(prompt);
-      const text = result.response.text();
+  const handleSend = async () => {
+    if (!inputText.trim() || isTyping) return;
+
+    const userMsg = { type: 'user', content: inputText };
+    setChatLog(prev => [...prev, userMsg]);
+    setInputText('');
+    setIsTyping(true);
+
+    try {
+      const model = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        systemInstruction: skillPathSystemInstruction
+      });
+
+      const context = knowledgeBaseRef.current ? `\n\nKNOWLEDGE BASE CONTEXT:\n${knowledgeBaseRef.current}` : "";
+      const result = await model.generateContent(inputText + context);
+      const response = await result.response;
+      const text = response.text();
 
       setChatLog(prev => [...prev, { type: 'ai', content: text }]);
-      speak(text);
-    } catch (e) {
-      console.error(e);
-      setChatLog(prev => [...prev, { type: 'ai', content: "⚠️ **Connection Error:** I encountered an error connecting to the Gemini LLM API." }]);
+    } catch (error) {
+      console.error("AI Error:", error);
+      setChatLog(prev => [...prev, { type: 'ai', content: "I've encountered a neural glitch. Please check your API key or connection." }]);
     } finally {
       setIsTyping(false);
+      setTimeout(() => chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     }
   };
 
@@ -235,37 +205,34 @@ function MainApp() {
     if (e.key === 'Enter') handleSend();
   };
 
-  // Protected Route Wrapper
-  const ProtectedRoute = ({ children }) => {
-    if (!isAuthenticated) return <Navigate to="/login" replace />;
-    return children;
+  const handleQuerySubmit = (query) => {
+    setInputText(query);
+    // Auto-trigger send if needed, but here we just fill it
   };
 
-  // Protected Layout Wrapper — Single Unified Header only
-  const ProtectedLayout = ({ children }) => (
-    <ProtectedRoute>
-      <div className="app-container">
+
+  const ProtectedLayout = ({ children }) => {
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    return (
+      <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
         <Header
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          isRecording={isRecording}
-          handleVoiceToggle={handleVoiceToggle}
+          user={user}
           setIsAuthenticated={setIsAuthenticated}
-          isUploading={isUploading}
-          handleFileUpload={handleFileUpload}
-          knowledgeBaseRef={knowledgeBaseRef}
           userXP={userXP}
           userLevel={userLevel}
           userCoins={userCoins}
+          isRecording={isRecording}
+          handleVoiceToggle={handleVoiceToggle}
+          isUploading={isUploading}
+          handleFileUpload={handleFileUpload}
+          knowledgeBaseRef={knowledgeBaseRef}
         />
-        <main className="main-content">
-          <div className="full-page-content" style={{ animation: "fadeIn 0.3s ease-in" }}>
-            {children}
-          </div>
-        </main>
+        <main>{children}</main>
       </div>
-    </ProtectedRoute>
-  );
+    );
+  };
 
   return (
     <Routes>
@@ -275,8 +242,8 @@ function MainApp() {
       <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register setAuth={setIsAuthenticated} />} />
 
       {/* PROTECTED ROUTES */}
-      <Route path="/dashboard" element={<ProtectedLayout><Dashboard setActiveTab={setActiveTab} /></ProtectedLayout>} />
-      <Route path="/profile" element={<ProtectedLayout><Profile userXP={userXP} userLevel={userLevel} /></ProtectedLayout>} />
+      <Route path="/dashboard" element={<ProtectedLayout><Dashboard setActiveTab={setActiveTab} userXP={userXP} userLevel={userLevel} userCoins={userCoins} user={user} /></ProtectedLayout>} />
+      <Route path="/profile" element={<ProtectedLayout><Profile userXP={userXP} userLevel={userLevel} user={user} /></ProtectedLayout>} />
       <Route path="/habittracker" element={<ProtectedLayout><HabitTracker userXP={userXP} userLevel={userLevel} setActiveTab={setActiveTab} /></ProtectedLayout>} />
 
       {/* ---------- NEW HUBS ---------- */}
@@ -288,65 +255,49 @@ function MainApp() {
       <Route path="/book-reader" element={<ProtectedLayout><BookReader /></ProtectedLayout>} />
       <Route path="/contact" element={<ProtectedLayout><Contact /></ProtectedLayout>} />
 
-      {/* GAMES MODULE SUBPAGES */}
-      <Route path="/quizgame" element={<ProtectedLayout><QuizGame setActiveTab={setActiveTab} /></ProtectedLayout>} />
-      <Route path="/solarsystem" element={<ProtectedRoute><SolarSystem setActiveTab={setActiveTab} /></ProtectedRoute>} />
-      <Route path="/urbanwarzone" element={<ProtectedRoute><UrbanWarzone setActiveTab={setActiveTab} /></ProtectedRoute>} />
-      <Route path="/escapegameshub" element={<ProtectedLayout><EscapeGamesHub setActiveTab={setActiveTab} /></ProtectedLayout>} />
-      <Route path="/escapechallenge" element={<ProtectedLayout><EscapeChallenge setActiveTab={setActiveTab} /></ProtectedLayout>} />
-      <Route path="/codeescapehouse" element={<ProtectedLayout><CodeEscapeHouse setActiveTab={setActiveTab} userCoins={userCoins} setUserCoins={setUserCoins} /></ProtectedLayout>} />
-      <Route path="/aisurvivalclimb" element={<ProtectedLayout><AISurvivalClimb setActiveTab={setActiveTab} /></ProtectedLayout>} />
-      <Route path="/multiplayer" element={<ProtectedLayout><MultiplayerArena /></ProtectedLayout>} />
+      <Route path="/games/code-escape" element={<ProtectedLayout><CodeEscapeHouse /></ProtectedLayout>} />
+      <Route path="/games/survival" element={<ProtectedLayout><AISurvivalClimb /></ProtectedLayout>} />
+      <Route path="/games/quiz" element={<ProtectedLayout><QuizGame /></ProtectedLayout>} />
+      <Route path="/games/solar" element={<ProtectedLayout><SolarSystem /></ProtectedLayout>} />
+      <Route path="/games/urban" element={<ProtectedLayout><UrbanWarzone /></ProtectedLayout>} />
 
-      {/* SKILL PATHS MODULE */}
-      <Route path="/skillpaths" element={<ProtectedLayout><SkillPaths setActiveTab={setActiveTab} /></ProtectedLayout>} />
+      <Route path="/learning/paths" element={<ProtectedLayout><SkillPaths /></ProtectedLayout>} />
+      <Route path="/learning/chatbot" element={<ProtectedLayout><Chatbot
+        chatLog={chatLog}
+        isTyping={isTyping}
+        inputText={inputText}
+        setInputText={setInputText}
+        handleKeyPress={handleKeyPress}
+        handleSend={handleSend}
+        chatBottomRef={chatBottomRef}
+        knowledgeBaseRef={knowledgeBaseRef}
+        handleQuerySubmit={handleQuerySubmit}
+      /></ProtectedLayout>} />
+      <Route path="/learning/sessions" element={<ProtectedLayout><ELearningSession /></ProtectedLayout>} />
+      <Route path="/learning/assessments" element={<ProtectedLayout><TestSystem /></ProtectedLayout>} />
+      <Route path="/learning/reviews" element={<ProtectedLayout><CodeReviewer /></ProtectedLayout>} />
 
-      {/* LEARNING MODULE SUBPAGES */}
-      <Route path="/codereviewer" element={<ProtectedLayout><CodeReviewer /></ProtectedLayout>} />
-      <Route path="/certificationhub" element={<ProtectedLayout><CertificationHub /></ProtectedLayout>} />
-      <Route path="/elearning" element={<ProtectedLayout><ELearningSession /></ProtectedLayout>} />
+      <Route path="/career/roadmap" element={<ProtectedLayout><CareerRoadmap /></ProtectedLayout>} />
+      <Route path="/career/jobs" element={<ProtectedLayout><JobTracker /></ProtectedLayout>} />
+      <Route path="/career/resume" element={<ProtectedLayout><Resume /></ProtectedLayout>} />
+      <Route path="/career/genie" element={<ProtectedLayout><CareerGenie /></ProtectedLayout>} />
+      <Route path="/career/alerts" element={<ProtectedLayout><CareerAlerts /></ProtectedLayout>} />
+      <Route path="/career/salary" element={<ProtectedLayout><SalaryInsights /></ProtectedLayout>} />
 
-      {/* COMMUNICATION MODULE SUBPAGES */}
-      <Route path="/englishlearning" element={<ProtectedLayout><EnglishLearning /></ProtectedLayout>} />
-      <Route path="/communication" element={<ProtectedLayout><CommunicationAssistant /></ProtectedLayout>} />
+      <Route path="/communication/english" element={<ProtectedLayout><EnglishLearning /></ProtectedLayout>} />
+      <Route path="/communication/assistant" element={<ProtectedLayout><CommunicationAssistant /></ProtectedLayout>} />
+      <Route path="/comm-arena" element={<ProtectedLayout><MultiplayerArena /></ProtectedLayout>} />
 
-      {/* CAREER MODULE SUBPAGES */}
-      <Route path="/resume" element={<ProtectedLayout><Resume /></ProtectedLayout>} />
-      <Route path="/careerroadmap" element={<ProtectedLayout><CareerRoadmap setActiveTab={setActiveTab} /></ProtectedLayout>} />
-      <Route path="/jobtracker" element={<ProtectedLayout><JobTracker setActiveTab={setActiveTab} /></ProtectedLayout>} />
-      <Route path="/careergenie" element={<ProtectedLayout><CareerGenie userXP={userXP} setUserXP={setUserXP} userLevel={userLevel} /></ProtectedLayout>} />
-
-      {/* OTHER FEATURES */}
-      <Route path="/communityhub" element={<ProtectedLayout><CommunityHub /></ProtectedLayout>} />
+      <Route path="/community" element={<ProtectedLayout><CommunityHub /></ProtectedLayout>} />
       <Route path="/trending" element={<ProtectedLayout><TrendingSection /></ProtectedLayout>} />
-      <Route path="/airecommendations" element={<ProtectedLayout><AiRecommendations /></ProtectedLayout>} />
-      <Route path="/trendingskills" element={<ProtectedLayout><TrendingSkills /></ProtectedLayout>} />
-      <Route path="/careeralerts" element={<ProtectedLayout><CareerAlerts /></ProtectedLayout>} />
-      <Route path="/salaryinsights" element={<ProtectedLayout><SalaryInsights /></ProtectedLayout>} />
-      <Route path="/aiconfidence" element={<ProtectedLayout><AiConfidenceScore /></ProtectedLayout>} />
-      <Route path="/notificationhub" element={<ProtectedLayout><NotificationHub /></ProtectedLayout>} />
-      <Route path="/notificationsettings" element={<ProtectedLayout><NotificationSettings /></ProtectedLayout>} />
-      <Route path="/riskstability" element={<ProtectedLayout><RiskStabilityIntelligence /></ProtectedLayout>} />
-      <Route path="/marketvulnerability" element={<ProtectedLayout><MarketVulnerability /></ProtectedLayout>} />
-      <Route path="/eventhub" element={<ProtectedLayout><EventHub /></ProtectedLayout>} />
-      <Route path="/analytics" element={<ProtectedLayout><Analytics userXP={userXP} userLevel={userLevel} /></ProtectedLayout>} />
-      <Route path="/testsystem" element={<ProtectedLayout><TestSystem /></ProtectedLayout>} />
-
-      <Route path="/chatbot" element={
-        <ProtectedLayout>
-          <Chatbot
-            chatLog={chatLog}
-            isTyping={isTyping}
-            inputText={inputText}
-            setInputText={setInputText}
-            handleKeyPress={handleKeyPress}
-            handleSend={handleSend}
-            chatBottomRef={chatBottomRef}
-            knowledgeBaseRef={knowledgeBaseRef}
-            handleQuerySubmit={handleQuerySubmit}
-          />
-        </ProtectedLayout>
-      } />
+      <Route path="/trending-skills" element={<ProtectedLayout><TrendingSkills /></ProtectedLayout>} />
+      <Route path="/notifications" element={<ProtectedLayout><NotificationHub /></ProtectedLayout>} />
+      <Route path="/notifications/settings" element={<ProtectedLayout><NotificationSettings /></ProtectedLayout>} />
+      <Route path="/analytics" element={<ProtectedLayout><Analytics /></ProtectedLayout>} />
+      <Route path="/risk-stability" element={<ProtectedLayout><RiskStabilityIntelligence /></ProtectedLayout>} />
+      <Route path="/market-vulnerability" element={<ProtectedLayout><MarketVulnerability /></ProtectedLayout>} />
+      <Route path="/events" element={<ProtectedLayout><EventHub /></ProtectedLayout>} />
+      <Route path="/ai-confidence" element={<ProtectedLayout><AiConfidenceScore /></ProtectedLayout>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

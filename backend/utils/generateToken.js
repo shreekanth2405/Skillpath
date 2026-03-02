@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRE || '30d' // Default to 30 days
+    return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback_secret', {
+        expiresIn: '30d',
     });
 };
 

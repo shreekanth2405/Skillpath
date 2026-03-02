@@ -6,7 +6,7 @@ import {
     PieChart, Pie, Cell
 } from 'recharts';
 
-const Dashboard = ({ setActiveTab }) => {
+const Dashboard = ({ setActiveTab, userXP, userLevel, userCoins, user }) => {
     // --- MOCK DATA ---
     const activePath = JSON.parse(localStorage.getItem('activeLearningPath'));
 
@@ -59,7 +59,7 @@ const Dashboard = ({ setActiveTab }) => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                     <div>
                         <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#0f172a', margin: '0 0 0.5rem 0' }}>
-                            Welcome back, Student 👋
+                            Welcome back, {user?.name || 'Student'} 👋
                         </h1>
                         <p style={{ color: '#64748b', fontSize: '1.1rem', margin: 0 }}>
                             Ready to level up your career today? Here's your overview.
@@ -87,10 +87,10 @@ const Dashboard = ({ setActiveTab }) => {
                 {/* QUICK STATS ROW */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
                     {[
-                        { title: 'Readiness Score', val: '88%', icon: 'fa-fire', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
-                        { title: 'Global Rank', val: 'Top 5%', icon: 'fa-trophy', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
-                        { title: 'Active Courses', val: '4', icon: 'fa-book-open-reader', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' },
-                        { title: 'Total XP', val: '2,450', icon: 'fa-star', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)' }
+                        { title: 'Market Readiness', val: `${Math.min(100, (userXP / 5000) * 100).toFixed(0)}%`, icon: 'fa-fire', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
+                        { title: 'Global Rank', val: userLevel > 5 ? 'Top 1%' : 'Top 5%', icon: 'fa-trophy', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
+                        { title: 'Current Wallet', val: userCoins.toLocaleString(), icon: 'fa-coins', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.1)' },
+                        { title: 'Total XP Earned', val: userXP.toLocaleString(), icon: 'fa-star', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)' }
                     ].map((stat, i) => (
                         <motion.div key={i} variants={itemVariants} className="hover-3d"
                             style={{

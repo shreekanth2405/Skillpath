@@ -1,11 +1,13 @@
-const User = require('../models/User');
+const prisma = require('../prismaClient');
+const bcrypt = require('bcryptjs');
+
 
 // @desc    Get user profile (includes gamification stats)
 // @route   GET /api/users/profile
 // @access  Private
 exports.getProfile = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await prisma.user.findUnique({ where: { id: req.user.id } });
         if (!user) {
             return res.status(404).json({ success: false, error: 'User not found' });
         }
@@ -20,14 +22,16 @@ exports.getProfile = async (req, res, next) => {
 // @access  Private
 exports.updateProfile = async (req, res, next) => {
     try {
-        // Prevent password or role update through this route
         const fieldsToUpdate = {};
         if (req.body.name) fieldsToUpdate.name = req.body.name;
         if (req.body.email) fieldsToUpdate.email = req.body.email;
+        if (typeof req.body.xp === 'number') fieldsToUpdate.xp = req.body.xp;
+        if (typeof req.body.level === 'number') fieldsToUpdate.level = req.body.level;
+        if (typeof req.body.coins === 'number') fieldsToUpdate.coins = req.body.coins;
 
-        const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
-            new: true,
-            runValidators: true
+        const user = await prisma.user.update({
+            where: { id: req.user.id },
+            data: fieldsToUpdate
         });
 
         res.status(200).json({ success: true, data: user });
@@ -41,21 +45,24 @@ exports.updateProfile = async (req, res, next) => {
 // @access  Private
 exports.updatePassword = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.id).select('+password');
+        const user = await prisma.user.findUnique({ where: { id: req.user.id } });
 
         if (!req.body.currentPassword || !req.body.newPassword) {
             return res.status(400).json({ success: false, error: 'Please provide current and new password' });
         }
 
-        // Check current password
-        const isMatch = await user.matchPassword(req.body.currentPassword);
+        const isMatch = await bcrypt.compare(req.body.currentPassword, user.password);
         if (!isMatch) {
             return res.status(401).json({ success: false, error: 'Password incorrect' });
         }
 
-        // Set and save new password (pre-save hook will hash it)
-        user.password = req.body.newPassword;
-        await user.save();
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
+
+        await prisma.user.update({
+            where: { id: req.user.id },
+            data: { password: hashedPassword }
+        });
 
         res.status(200).json({ success: true, message: 'Password updated successfully' });
     } catch (err) {
@@ -68,7 +75,7 @@ exports.updatePassword = async (req, res, next) => {
 // @access  Private
 exports.deleteAccount = async (req, res, next) => {
     try {
-        await User.findByIdAndDelete(req.user.id);
+        await prisma.user.delete({ where: { id: req.user.id } });
         res.status(200).json({ success: true, data: {} });
     } catch (err) {
         next(err);

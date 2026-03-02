@@ -83,22 +83,76 @@ const HabitTracker = ({ userXP = 2450, userLevel = 3, setActiveTab: setGlobalTab
         setTimeout(() => setNotification(null), 3000);
     }, []);
 
-    const completeHabit = useCallback((id) => {
-        setHabits(prev => prev.map(h => {
-            if (h.id !== id || h.completedToday) return h;
-            setTotalXP(x => x + h.xpPerCompletion);
-            showNotif(`+${h.xpPerCompletion} XP — "${h.title}" completed! 🎉`);
-            return { ...h, completedToday: true, streak: h.streak + 1, totalDone: h.totalDone + 1 };
-        }));
+    // Fetch habits from backend
+    useEffect(() => {
+        const fetchHabits = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/habits`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setHabits(data.data.length > 0 ? data.data : INITIAL_HABITS);
+                }
+            } catch (err) {
+                console.error('Error fetching habits:', err);
+            }
+        };
+        fetchHabits();
+    }, []);
+
+    const completeHabit = useCallback(async (id) => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/habits/${id}/complete`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                setHabits(prev => prev.map(h => h.id === id ? data.data : h));
+                setTotalXP(x => x + (data.data.xpPerCompletion || 30));
+                showNotif(`+${data.data.xpPerCompletion} XP — Habit completed! 🎉`);
+            }
+        } catch (err) {
+            console.error('Error completing habit:', err);
+            showNotif('Failed to sync habit completion.', 'danger');
+        }
     }, [showNotif]);
 
-    const addHabit = () => {
+    const addHabit = async () => {
         if (!newHabit.title.trim()) return;
         const catInfo = CATEGORIES_MAP[newHabit.category];
-        setHabits(p => [...p, { id: Date.now(), ...newHabit, streak: 0, completedToday: false, totalDone: 0, target: 30, xpPerCompletion: 30, color: catInfo?.color || '#6366f1' }]);
-        setNewHabit({ title: '', category: 'Learning', frequency: 'Daily', reminder: '08:00' });
-        setShowAddModal(false);
-        showNotif('New habit added! Keep it up! 💪');
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/habits`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    ...newHabit,
+                    target: 30,
+                    xpPerCompletion: 30,
+                    color: catInfo?.color || '#6366f1'
+                })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                setHabits(p => [data.data, ...p]);
+                setNewHabit({ title: '', category: 'Learning', frequency: 'Daily', reminder: '08:00' });
+                setShowAddModal(false);
+                showNotif('New habit added! Keep it up! 💪');
+            }
+        } catch (err) {
+            console.error('Error adding habit:', err);
+            showNotif('Failed to add habit.', 'danger');
+        }
     };
 
     const completed = habits.filter(h => h.completedToday).length;

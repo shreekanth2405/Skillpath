@@ -14,6 +14,7 @@ const Header = ({
     userXP,
     userLevel,
     userCoins,
+    user,
 }) => {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -104,20 +105,20 @@ const Header = ({
             { id: 'dashboard', label: 'Main Dashboard', icon: 'fa-house', desc: 'Central command & overview' },
             { id: 'learning', label: 'Learning Hub', icon: 'fa-book-open', desc: '1000+ courses & tutorials' },
             { id: 'career', label: 'Career Hub', icon: 'fa-briefcase', desc: 'Resumes, trackers, roadmaps' },
-            { id: 'skillpaths', label: 'AI Skill Path Editor', icon: 'fa-road', desc: 'Generate custom curricula' },
+            { id: 'learning/paths', label: 'AI Skill Path Editor', icon: 'fa-road', desc: 'Generate custom curricula' },
         ],
         'Communication & Growth': [
             { id: 'communicationhub', label: 'Communication Hub', icon: 'fa-comments', desc: 'Speaking & Language' },
             { id: 'habittracker', label: 'Habit Tracker', icon: 'fa-fire', desc: 'Daily consistency monitor' },
-            { id: 'eventhub', label: 'Global Event Hub', icon: 'fa-calendar-star', desc: 'Join global events' },
+            { id: 'events', label: 'Global Event Hub', icon: 'fa-calendar-star', desc: 'Join global events' },
         ]
     };
 
     const mainLinks = [
-        { id: 'communityhub', label: 'Community' },
+        { id: 'community', label: 'Community' },
         { id: 'resources', label: 'Resources' },
         { id: 'games', label: 'Games' },
-        { id: 'chatbot', label: 'AI Chatbot', isSpecial: true },
+        { id: 'learning/chatbot', label: 'AI Chatbot', isSpecial: true },
         { id: 'contact', label: 'Contact' }
     ];
 
@@ -354,12 +355,12 @@ const Header = ({
                             onClick={() => { setShowProfileMenu(p => !p); setShowNotifications(false); }}
                         >
                             <div className="unav-profile-info">
-                                <span className="unav-profile-name">Shreyas</span>
-                                <span className="unav-profile-role">Pro Member</span>
+                                <span className="unav-profile-name">{user?.name || 'Student'}</span>
+                                <span className="unav-profile-role">{user?.role === 'admin' ? 'Administrator' : 'Pro Member'}</span>
                             </div>
                             <div className="unav-avatar-wrap">
                                 <img
-                                    src="https://ui-avatars.com/api/?name=Shreyas&background=6366f1&color=fff&size=80"
+                                    src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.name || 'Student'}&background=6366f1&color=fff&size=80`}
                                     alt="Avatar"
                                     className="unav-avatar"
                                 />
@@ -370,13 +371,13 @@ const Header = ({
                             <div className="unav-dropdown profile-panel slide-down">
                                 <div className="unav-profile-header">
                                     <img
-                                        src="https://ui-avatars.com/api/?name=Shreyas&background=6366f1&color=fff&size=80"
+                                        src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.name || 'Student'}&background=6366f1&color=fff&size=80`}
                                         alt="Avatar"
                                         className="unav-profile-big-avatar"
                                     />
                                     <div>
-                                        <p className="unav-profile-big-name">Shreyas</p>
-                                        <p className="unav-profile-big-role">Pro Member · LVL {userLevel}</p>
+                                        <p className="unav-profile-big-name">{user?.name || 'Student'}</p>
+                                        <p className="unav-profile-big-role">{user?.role === 'admin' ? 'Administrator' : 'Pro Member'} · LVL {userLevel}</p>
                                     </div>
                                 </div>
                                 <div className="unav-profile-menu">

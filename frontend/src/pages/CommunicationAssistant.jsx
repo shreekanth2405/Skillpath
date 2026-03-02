@@ -121,6 +121,7 @@ const CommunicationAssistant = () => {
     const [showReport, setShowReport] = useState(false);
     const [reportData, setReportData] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [sessionId, setSessionId] = useState(null);
 
     // Refs for persistence
     const recognitionRef = useRef(null);
@@ -172,6 +173,42 @@ const CommunicationAssistant = () => {
 
             setTranscript(prev => [...prev, { speaker: 'AI', text: aiResponse, timestamp: new Date() }]);
             speak(aiResponse);
+
+            // Sync with backend
+            if (sessionId) {
+                try {
+                    const token = localStorage.getItem('token');
+                    await fetch(`${import.meta.env.VITE_API_URL}/v1/communication/session/${sessionId}/analyze`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            text: userText,
+                            speaker: 'User',
+                            metrics: {
+                                confidenceIndex: speakingScore / 10,
+                                grammarScore: Math.round(90 - (mistakes.length * 2)) // Rough estimate
+                            }
+                        })
+                    });
+
+                    await fetch(`${import.meta.env.VITE_API_URL}/v1/communication/session/${sessionId}/analyze`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            text: aiResponse,
+                            speaker: 'AI'
+                        })
+                    });
+                } catch (syncErr) {
+                    console.error("Backend sync failed:", syncErr);
+                }
+            }
 
             // Score simulation
             setSpeakingScore(prev => Math.min(100, (prev === 0 ? 65 : prev) + (Math.random() * 5)));
@@ -249,10 +286,31 @@ const CommunicationAssistant = () => {
         recognitionRef.current = recognition;
     };
 
-    const startConversation = () => {
+    const startConversation = async () => {
         setIsSessionActive(true);
         setTranscript([]);
         setSpeakingScore(0);
+        setMistakes([]);
+
+        // Initialize session in backend
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/communication/session/start`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ topic: mode })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setSessionId(data.data.id);
+            }
+        } catch (err) {
+            console.error("Failed to start session in backend:", err);
+        }
+
         setupRecognition();
         recognitionRef.current.start();
 
@@ -261,18 +319,44 @@ const CommunicationAssistant = () => {
         speak(greeting);
     };
 
-    const stopConversation = () => {
+    const stopConversation = async () => {
         setIsSessionActive(false);
         setStatus('off');
         recognitionRef.current?.stop();
         synthesisRef.current?.cancel();
 
-        setReportData({
+        const finalStats = {
             score: Math.round(speakingScore),
             messages: transcript.length,
             mistakes: mistakes,
-            recommendation: "Excellent progress! Next time, try to incorporate more complex transition words like 'subsequently' or 'notwithstanding' to boost your vocabulary richness."
-        });
+            recommendation: "Excellent progress! Next time, try to incorporate more complex transition words to boost your vocabulary richness."
+        };
+
+        // Complete session in backend
+        if (sessionId) {
+            try {
+                const token = localStorage.getItem('token');
+                await fetch(`${import.meta.env.VITE_API_URL}/v1/communication/session/${sessionId}/complete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        finalMetrics: {
+                            fluencyWpm: 120, // Simulated
+                            grammarScore: Math.round(90 - (mistakes.length * 2)),
+                            confidenceIndex: speakingScore / 10,
+                            finalCefrLevel: "B2"
+                        }
+                    })
+                });
+            } catch (err) {
+                console.error("Failed to complete session in backend:", err);
+            }
+        }
+
+        setReportData(finalStats);
         setShowReport(true);
     };
 

@@ -1,6 +1,5 @@
-const Job = require('../models/Job');
-const JobMatch = require('../models/JobMatch');
-const User = require('../models/User');
+const prisma = require('../prismaClient');
+
 
 // @desc    Get all job matches for logged in user
 // @route   GET /api/v1/jobs/matches
@@ -10,21 +9,27 @@ exports.getJobMatches = async (req, res) => {
         const { status, min_score } = req.query;
 
         // Base query - matches for the user
-        let query = { userId: req.user.id };
+        let where = { userId: req.user.id };
 
         // Filter by status if provided (e.g., 'New', 'Applied', etc.)
         if (status) {
-            query.matchStatus = status;
+            where.matchStatus = status;
         }
 
         // Filter by minimum score if provided
         if (min_score) {
-            query.relevanceScore = { $gte: Number(min_score) };
+            where.relevanceScore = { gte: Number(min_score) };
         }
 
-        const matches = await JobMatch.find(query)
-            .populate('jobId')
-            .sort({ relevanceScore: -1 });
+        const matches = await prisma.jobMatch.findMany({
+            where,
+            include: {
+                job: true // Corresponds to .populate('jobId')
+            },
+            orderBy: {
+                relevanceScore: 'desc'
+            }
+        });
 
         res.status(200).json({
             success: true,
@@ -44,22 +49,23 @@ exports.updateJobMatchStatus = async (req, res) => {
     try {
         const { status } = req.body;
 
-        let jobMatch = await JobMatch.findById(req.params.id);
+        let jobMatch = await prisma.jobMatch.findUnique({
+            where: { id: req.params.id }
+        });
 
         if (!jobMatch) {
             return res.status(404).json({ success: false, error: 'Job Match not found' });
         }
 
         // Ensure user owns this match
-        if (jobMatch.userId.toString() !== req.user.id) {
+        if (jobMatch.userId !== req.user.id) {
             return res.status(401).json({ success: false, error: 'Not authorized to update this job match' });
         }
 
-        jobMatch = await JobMatch.findByIdAndUpdate(
-            req.params.id,
-            { matchStatus: status || 'Applied' },
-            { new: true, runValidators: true }
-        );
+        jobMatch = await prisma.jobMatch.update({
+            where: { id: req.params.id },
+            data: { matchStatus: status || 'Applied' }
+        });
 
         res.status(200).json({
             success: true,
@@ -77,9 +83,11 @@ exports.updateJobMatchStatus = async (req, res) => {
 exports.getSkillGaps = async (req, res) => {
     try {
         // Find highly matched jobs for this user
-        const highMatches = await JobMatch.find({
-            userId: req.user.id,
-            relevanceScore: { $gte: 80 }
+        const highMatches = await prisma.jobMatch.findMany({
+            where: {
+                userId: req.user.id,
+                relevanceScore: { gte: 80 }
+            }
         });
 
         const skillGaps = {};

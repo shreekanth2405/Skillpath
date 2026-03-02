@@ -52,13 +52,34 @@ Return ONLY a valid JSON object, no markdown or backticks around it:
         }
     };
 
-    const submitQuiz = () => {
+    const submitQuiz = async () => {
         if (!quizData) return;
         let score = 0;
         quizData.questions.forEach(q => {
             if (quizAnswers[q.id] === q.correctIndex) score++;
         });
         setQuizScore(score);
+
+        // Sync to backend
+        try {
+            const token = localStorage.getItem('token');
+            if (token) {
+                await fetch(`${import.meta.env.VITE_API_URL}/v1/test-system/quiz`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        topic: quizData.topic,
+                        score: score,
+                        totalQuestions: quizData.questions.length
+                    })
+                });
+            }
+        } catch (err) {
+            console.error("Failed to sync quiz score", err);
+        }
     };
 
     const handleGenerateChallenge = async () => {
@@ -117,7 +138,31 @@ Return ONLY a valid JSON object, no markdown or backticks:
             const result = await model.generateContent(prompt);
             let text = result.response.text();
             text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            setCodeFeedback(JSON.parse(text));
+            const feedbackJson = JSON.parse(text);
+            setCodeFeedback(feedbackJson);
+
+            // Sync to backend
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    await fetch(`${import.meta.env.VITE_API_URL}/v1/test-system/challenge`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            topic: challengeData.title,
+                            passed: feedbackJson.passed,
+                            feedback: feedbackJson.feedback,
+                            codeSubmitted: codeDraft
+                        })
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to sync challenge result", err);
+            }
+
         } catch (e) {
             console.error(e);
             setCodeFeedback({ passed: false, feedback: "Error connecting to validation server." });

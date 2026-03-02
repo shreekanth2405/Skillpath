@@ -6,12 +6,12 @@ const ELearningSession = () => {
     const [activeTab, setActiveTab] = useState('overview');
 
     const curriculum = [
-        { id: 0, title: 'Introduction to Generative AI', duration: '12:45', thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=300&q=80' },
-        { id: 1, title: 'Understanding Transformers Architecture', duration: '24:10', thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=300&q=80' },
-        { id: 2, title: 'Fine-Tuning Large Language Models', duration: '45:30', thumbnail: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=300&q=80' },
-        { id: 3, title: 'Deploying AI Agents in Production', duration: '18:15', thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=300&q=80' },
-        { id: 4, title: 'Ethical Implications of AI', duration: '32:00', thumbnail: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=300&q=80' },
-        { id: 5, title: 'Future of Neural Networks', duration: '21:40', thumbnail: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=300&q=80' }
+        { id: 0, title: 'Introduction to Generative AI', duration: '12:45', thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=300&q=80', videoUrl: 'https://www.youtube.com/embed/zjkBMFhNj_g?rel=0' },
+        { id: 1, title: 'Understanding Transformers Architecture', duration: '24:10', thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=300&q=80', videoUrl: 'https://www.youtube.com/embed/wjZofJX0v4M?rel=0' },
+        { id: 2, title: 'Fine-Tuning Large Language Models', duration: '45:30', thumbnail: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=300&q=80', videoUrl: 'https://www.youtube.com/embed/QEa840Y6GAA?rel=0' },
+        { id: 3, title: 'Deploying AI Agents in Production', duration: '18:15', thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=300&q=80', videoUrl: 'https://www.youtube.com/embed/T4P36Q2K85s?rel=0' },
+        { id: 4, title: 'Ethical Implications of AI', duration: '32:00', thumbnail: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=300&q=80', videoUrl: 'https://www.youtube.com/embed/I01b6E04A7I?rel=0' },
+        { id: 5, title: 'Future of Neural Networks', duration: '21:40', thumbnail: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=300&q=80', videoUrl: 'https://www.youtube.com/embed/aircAruvnKk?rel=0' }
     ];
 
     return (
@@ -29,32 +29,14 @@ const ELearningSession = () => {
                         overflow: 'hidden',
                         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
                     }}>
-                        {/* Mock Video Placeholder */}
-                        <div style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            background: 'linear-gradient(45deg, #1e293b, #0f172a)'
-                        }}>
-                            <img
-                                src={curriculum[activeVideo].thumbnail}
-                                style={{ position: 'absolute', width: '100%', height: '100%', objectFit: 'cover', opacity: 0.3 }}
-                                alt="Video Background"
-                            />
-                            <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10, boxShadow: '0 0 30px rgba(59, 130, 246, 0.5)' }}
-                            >
-                                <i className="fa-solid fa-play" style={{ fontSize: '3rem', marginLeft: '8px' }}></i>
-                            </motion.div>
-                            <h2 style={{ zIndex: 10, marginTop: '2rem', fontWeight: 800 }}>Now Playing: {curriculum[activeVideo].title}</h2>
-                        </div>
+                        {/* Real Video Player */}
+                        <iframe
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                            src={curriculum[activeVideo].videoUrl}
+                            title={curriculum[activeVideo].title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        ></iframe>
                     </div>
 
                     <div style={{ marginTop: '2rem' }}>

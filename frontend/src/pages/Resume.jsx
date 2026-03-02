@@ -62,16 +62,101 @@ const Resume = () => {
     useEffect(() => {
         const saved = localStorage.getItem('sp_resume_draft');
         if (saved) { try { setResumeData(JSON.parse(saved)); } catch { /* noop */ } }
-        const v = localStorage.getItem('sp_resume_versions');
-        if (v) { try { setVersions(JSON.parse(v)); } catch { /* noop */ } }
+
+        const fetchVersions = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/resumes`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const json = await res.json();
+                if (json.success && json.data) {
+                    setVersions(json.data.map(v => ({
+                        id: v.id,
+                        timestamp: new Date(v.createdAt).toLocaleString(),
+                        template: v.template,
+                        preview: v.name,
+                        content: v.content,
+                        atsScore: v.atsScore
+                    })));
+                }
+            } catch (err) {
+                console.error("Failed to fetch resumes", err);
+            }
+        };
+        fetchVersions();
     }, []);
 
-    const saveVersion = () => {
+    const saveVersion = async (currentAtsScore) => {
         if (!generatedResume) return;
-        const v = { id: Date.now(), timestamp: new Date().toLocaleString(), template, preview: generatedResume.name };
-        const updated = [v, ...versions].slice(0, 5);
-        setVersions(updated);
-        localStorage.setItem('sp_resume_versions', JSON.stringify(updated));
+
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/resumes`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: generatedResume.name || 'Untitled Resume',
+                    template,
+                    content: generatedResume,
+                    atsScore: currentAtsScore !== undefined ? currentAtsScore : atsScore
+                })
+            });
+            const json = await res.json();
+            if (json.success) {
+                const v = {
+                    id: json.data.id,
+                    timestamp: new Date(json.data.createdAt).toLocaleString(),
+                    template: json.data.template,
+                    preview: json.data.name,
+                    content: json.data.content,
+                    atsScore: json.data.atsScore
+                };
+                setVersions(prev => [v, ...prev].slice(0, 5));
+            }
+        } catch (err) {
+            console.error("Failed to save resume", err);
+        }
+    };
+
+    // ── ISOLATED SAVE HELPER FOR GENERATION ────────
+    const saveGeneratedVersion = async (resumeJson, score) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/resumes`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: resumeJson.name || 'Untitled Resume',
+                    template,
+                    content: resumeJson,
+                    atsScore: score
+                })
+            });
+            const json = await res.json();
+            if (json.success) {
+                const v = {
+                    id: json.data.id,
+                    timestamp: new Date(json.data.createdAt).toLocaleString(),
+                    template: json.data.template,
+                    preview: json.data.name,
+                    content: json.data.content,
+                    atsScore: json.data.atsScore
+                };
+                setVersions(prev => [v, ...prev].slice(0, 5));
+            }
+        } catch (err) {
+            console.error("Failed to save resume", err);
+        }
     };
 
     // ── GENERATE RESUME ────────────────────────────────────────────
@@ -101,7 +186,9 @@ Create a professional resume. Output ONLY valid JSON (no markdown) matching:
             const parsed = JSON.parse(text);
             setGeneratedResume(parsed);
             setAtsScore(parsed.atsScore || 78);
-            saveVersion();
+            // In React state updates are async, so pass atsScore explicitly. Wait, generatedResume is also state!
+            // Let's fix that by passing parsed directly.
+            await saveGeneratedVersion(parsed, parsed.atsScore || 78);
         } catch (e) {
             console.error(e);
             alert('AI generation failed. Please try again.');
@@ -211,10 +298,10 @@ Output ONLY pure JSON (no markdown):
                                 {versions.length === 0 ? <p style={{ color: '#94a3b8', fontSize: '0.875rem', margin: 0 }}>No versions saved yet. Generate a resume to save a version.</p> : (
                                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                                         {versions.map(v => (
-                                            <div key={v.id} style={{ background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <div key={v.id} onClick={() => { setGeneratedResume(v.content); setTemplate(v.template); setAtsScore(v.atsScore); setActiveTab('preview'); }} style={{ background: 'white', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', transition: 'all 0.2s', '&:hover': { borderColor: '#6366f1' } }}>
                                                 <i className="fa-solid fa-file-lines" style={{ color: '#6366f1' }} />
                                                 <div>
-                                                    <p style={{ margin: 0, fontWeight: 700, fontSize: '0.85rem' }}>{v.preview}</p>
+                                                    <p style={{ margin: 0, fontWeight: 700, fontSize: '0.85rem' }}>{v.preview || 'Generated Resume'}</p>
                                                     <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.75rem' }}>{v.timestamp} · {v.template}</p>
                                                 </div>
                                             </div>
