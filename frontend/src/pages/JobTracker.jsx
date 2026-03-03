@@ -100,22 +100,63 @@ const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
         { name: 'Fiverr', url: 'https://www.fiverr.com/', icon: 'fa-solid fa-star', color: '#1dbf73' }
     ];
 
-    // Simulation of live scanning
+    // Simulation of live scanning combined with actual backend NLP triggering
     useEffect(() => {
+        let isCancelled = false;
+
+        const runBackendScan = async () => {
+            const targetRole = searchQuery || "Software Developer";
+            try {
+                // Actually hit the Python NLP scripts running on the Express backend!
+                const scanRes = await axiosInstance.post('/scan', { role: targetRole });
+
+                if (!isCancelled && scanRes.data.success) {
+                    setScanProgress(100);
+                    setTimeout(() => {
+                        setIsScanning(false);
+                        setLogs(prev => [`[SUCCESS] AI Script finished execution.`, `Seeded DB with new ${targetRole} match!`, ...prev]);
+
+                        // Append the newly created job match into the live UI immediately!
+                        const match = scanRes.data.data;
+                        const newFormattedJob = {
+                            id: match.id,
+                            jobId: match.job.id,
+                            title: match.job.jobTitle,
+                            company: match.job.companyName,
+                            location: match.job.location.join(', '),
+                            exp: match.job.experienceRequired || 'N/A',
+                            score: match.relevanceScore,
+                            type: 'Direct',
+                            time: new Date(match.job.postedAt).toLocaleDateString(),
+                            link: match.job.sourceUrl,
+                            domain: match.job.sourceDomain,
+                            status: match.matchStatus,
+                            matchingSkills: match.job.skillsRequired.slice(0, 3) || [],
+                            missingSkills: match.skillGap || []
+                        };
+
+                        setJobs(prevJobs => [newFormattedJob, ...prevJobs]);
+                        setActiveTab('dashboard'); // Force view back to dashboard to see new item
+                        setScanProgress(0); // Reset for next time
+                    }, 500);
+                }
+            } catch (err) {
+                if (!isCancelled) {
+                    console.error("Scan Failed:", err);
+                    setIsScanning(false);
+                    setLogs(prev => [`[ERROR] Pipeline failed or timed out.`, ...prev]);
+                    setScanProgress(0);
+                }
+            }
+        };
+
         if (isScanning) {
+            runBackendScan();
+
+            // This interval purely handles the visual UI loading logic logging different scrapers
             const targetRole = searchQuery || "Software Developer";
             const interval = setInterval(() => {
-                setScanProgress(p => {
-                    if (p >= 100) {
-                        setIsScanning(false);
-                        // In reality, this would poll for new jobs or trigger a backend scrape job
-                        // For now we just add a mock log.
-                        setLogs(prev => [`Scan complete. New nodes active.`, ...prev]);
-                        setActiveTab('dashboard'); // Force view back to dashboard to see new items
-                        return 0;
-                    }
-                    return p + 0.5;
-                });
+                setScanProgress(p => p < 95 ? p + 0.5 : p); // Cap at 95% until real backend finishes!
 
                 if (Math.random() > 0.6) {
                     const engine = jobWebsites[Math.floor(Math.random() * jobWebsites.length)].name;
@@ -130,7 +171,11 @@ const JobTracker = ({ setActiveTab: appSetActiveTab }) => {
                     setLogs(prev => [selectedLog, ...prev].slice(0, 10));
                 }
             }, 50);
-            return () => clearInterval(interval);
+
+            return () => {
+                isCancelled = true;
+                clearInterval(interval);
+            }
         }
     }, [isScanning, searchQuery]);
 

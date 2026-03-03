@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 // ─── DATA ──────────────────────────────────────────────────────────────
 const CATEGORIES = ['All', 'AI & Tech', 'Career', 'Hackathon', 'Design', 'Health', 'Finance'];
@@ -109,6 +110,7 @@ function useCountdown(targetDate) {
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────
 const EventHub = () => {
+    const [eventsList, setEventsList] = useState(EVENTS); // fallback to mock, but we will overwrite with DB
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState('All');
     const [filterMode, setFilterMode] = useState('All');
@@ -120,8 +122,33 @@ const EventHub = () => {
     const [activeSection, setActiveSection] = useState('events'); // events | schedule | speakers | faq
     const countdown = useCountdown('2026-03-15T10:00:00');
 
+    useEffect(() => {
+        // Fetch Live Schedule and Registrations from PostgreSQL Backend
+        const fetchRemoteEvents = async () => {
+            try {
+                const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+
+                // Fetch all global events
+                const eventsRes = await axios.get(`${import.meta.env.VITE_API_URL}/v1/events`);
+                if (eventsRes.data.success && eventsRes.data.data.length > 0) {
+                    setEventsList(eventsRes.data.data);
+                }
+
+                // Fetch my registrations
+                const myRegRes = await axios.get(`${import.meta.env.VITE_API_URL}/v1/events/my-registrations`, { headers });
+                if (myRegRes.data.success) {
+                    const regIds = myRegRes.data.data.map(reg => reg.eventId);
+                    setRegistered(regIds);
+                }
+            } catch (err) {
+                console.error("Failed to load backend events. Using fallback data.", err);
+            }
+        };
+        fetchRemoteEvents();
+    }, []);
+
     const filtered = useMemo(() =>
-        EVENTS.filter(e =>
+        eventsList.filter(e =>
             (category === 'All' || e.category === category) &&
             (filterMode === 'All' || e.mode === filterMode) &&
             (filterPrice === 'All' || e.price === filterPrice) &&
@@ -129,8 +156,19 @@ const EventHub = () => {
         ), [category, filterMode, filterPrice, search]);
 
     const toggleBookmark = (id) => setBookmarks(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
-    const register = (e) => {
-        if (!registered.includes(e.id)) setRegistered(p => [...p, e.id]);
+
+    // Send registration to Postgres
+    const register = async (e) => {
+        if (!registered.includes(e.id)) {
+            try {
+                const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+                await axios.post(`${import.meta.env.VITE_API_URL}/v1/events/${e.id}/register`, {}, { headers });
+                setRegistered(p => [...p, e.id]);
+            } catch (err) {
+                console.error("Registration failed:", err);
+                alert(err.response?.data?.error || "Registration system offline");
+            }
+        }
         setSelectedEvent(null);
     };
 
@@ -166,7 +204,7 @@ const EventHub = () => {
                         </p>
 
                         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '3rem' }}>
-                            <button onClick={() => setSelectedEvent(EVENTS[0])} style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'white', border: 'none', padding: '0.85rem 2rem', borderRadius: '12px', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 24px rgba(99,102,241,0.4)' }}>
+                            <button onClick={() => { if (eventsList.length > 0) setSelectedEvent(eventsList[0]); }} style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'white', border: 'none', padding: '0.85rem 2rem', borderRadius: '12px', fontWeight: 800, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 8px 24px rgba(99,102,241,0.4)' }}>
                                 <i className="fa-solid fa-rocket" /> Register Now — Free
                             </button>
                             <button onClick={() => setActiveSection('schedule')} style={{ background: 'rgba(255,255,255,0.08)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', padding: '0.85rem 2rem', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '8px', backdropFilter: 'blur(10px)' }}>
@@ -248,7 +286,7 @@ const EventHub = () => {
                                             <span style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', padding: '2px 10px', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 800 }}>AI Recommended</span>
                                         </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
-                                            {EVENTS.filter(e => e.recommended).map(event => (
+                                            {eventsList.filter(e => e.recommended).map(event => (
                                                 <EventCard key={event.id} event={event} isBookmarked={bookmarks.includes(event.id)} isRegistered={registered.includes(event.id)} onBookmark={() => toggleBookmark(event.id)} onOpen={() => setSelectedEvent(event)} typeColor={typeColor} />
                                             ))}
                                         </div>

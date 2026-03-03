@@ -14,7 +14,7 @@ app.use(helmet());
 
 // Enable CORS
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: [process.env.FRONTEND_URL || 'http://localhost:5173', 'http://localhost:5174'],
     credentials: true,
 }));
 
@@ -35,6 +35,11 @@ const limiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api', limiter);
+
+// Root Route
+app.get('/', (req, res) => {
+    res.send('SkillPath Backend API is running. Access endpoints via /api/...');
+});
 
 // Base Route
 app.get('/api/health', async (req, res) => {
@@ -61,11 +66,17 @@ app.get('/api/health', async (req, res) => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+
 app.use('/api/v1/jobs', require('./routes/jobRoutes'));
 app.use('/api/v1/habits', require('./routes/habitRoutes'));
 app.use('/api/v1/communication', require('./routes/communicationRoutes'));
 app.use('/api/v1/test-system', require('./routes/testSystemRoutes'));
 app.use('/api/v1/resumes', require('./routes/resumeRoutes'));
+
+
+app.use('/api/v1/bookmarks', require('./routes/bookmarkRoutes'));
+app.use('/api/v1/events', require('./routes/eventRoutes'));
+app.use('/api/v1/certifications', require('./routes/certificationRoutes'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {

@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+
+import axios from 'axios';
 
 const Resources = () => {
     const navigate = useNavigate();
@@ -9,6 +11,29 @@ const Resources = () => {
     const [level, setLevel] = useState(1); // 1: Category, 2: SubCategory, 3: Subject/Books
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+    const [bookmarkedGames, setBookmarkedGames] = useState({});
+
+    useEffect(() => {
+        // Fetch User's existing bookmarks from backend on load
+        const fetchBookmarks = async () => {
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/v1/bookmarks`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (res.data.success) {
+                    const loadedBookmarks = {};
+                    res.data.data.forEach(b => {
+                        loadedBookmarks[b.title] = b.id;
+                    });
+                    setBookmarkedGames(loadedBookmarks);
+                }
+            } catch (err) {
+                console.error("Failed to fetch bookmarks:", err);
+            }
+        };
+        fetchBookmarks();
+    }, []);
 
     // --- Data Structure ---
     const libraryData = [
@@ -94,6 +119,45 @@ const Resources = () => {
         }
     };
 
+    const toggleBookmark = async (e, book, categoryContext) => {
+        e.stopPropagation();
+        const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+
+        try {
+            // Un-bookmark (Delete from DB)
+            if (bookmarkedGames[book]) {
+                const bookmarkId = bookmarkedGames[book];
+                await axios.delete(`${import.meta.env.VITE_API_URL}/v1/bookmarks/${bookmarkId}`, { headers });
+
+                const newBookmarks = { ...bookmarkedGames };
+                delete newBookmarks[book];
+                setBookmarkedGames(newBookmarks);
+            }
+            // Bookmark (Add to DB)
+            else {
+                const res = await axios.post(`${import.meta.env.VITE_API_URL}/v1/bookmarks`, {
+                    title: book,
+                    category: categoryContext,
+                    isArchiveOrg: false
+                }, { headers });
+
+                if (res.data.success) {
+                    setBookmarkedGames(prev => ({
+                        ...prev,
+                        [book]: res.data.data.id
+                    }));
+                }
+            }
+        } catch (err) {
+            console.error("Bookmark toggle failed:", err);
+            // Fallback for optimism in local dev
+            const newBookmarks = { ...bookmarkedGames };
+            if (newBookmarks[book]) delete newBookmarks[book];
+            else newBookmarks[book] = 'temp-id';
+            setBookmarkedGames(newBookmarks);
+        }
+    };
+
     return (
         <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', minHeight: '80vh' }}>
 
@@ -164,11 +228,7 @@ const Resources = () => {
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '2rem' }}>
                                     {subj.books.map((book, j) => (
                                         <motion.div key={j} whileHover={{ y: -10 }}
-                                            onClick={() => {
-                                                if (book === '3D Solar System Experience') navigate('/solarsystem');
-                                                else navigate('/book-reader');
-                                            }}
-                                            className="hover-3d" style={{ background: 'white', borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)', cursor: 'pointer', display: 'flex', flexDirection: 'column', transition: '0.3s' }}>
+                                            className="hover-3d" style={{ background: 'white', borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', transition: '0.3s' }}>
                                             {/* Book Cover Placeholder */}
                                             <div style={{ height: '260px', background: 'linear-gradient(135deg, #1e293b, #0f172a)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center' }}>
                                                 <h4 style={{ color: 'white', fontSize: '1.1rem', margin: 0, fontWeight: 800, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{book}</h4>
@@ -177,8 +237,11 @@ const Resources = () => {
                                             <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
                                                 <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: '#0f172a' }}>{book}</h4>
                                                 <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
-                                                    <button style={{ flex: 1, padding: '8px', background: '#eff6ff', color: '#2563eb', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>Read</button>
-                                                    <button style={{ width: '40px', padding: '8px', background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer' }}><i className="fa-regular fa-bookmark"></i></button>
+                                                    <button onClick={() => { if (book === '3D Solar System Experience') navigate('/solarsystem'); else navigate('/book-reader'); }} style={{ flex: 1, padding: '8px', background: '#eff6ff', color: '#2563eb', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>Read</button>
+                                                    <button onClick={(e) => { e.stopPropagation(); window.open(`https://archive.org/search.php?query=${encodeURIComponent(book + ' book')}`, '_blank'); }} title="Search on Archive.org" style={{ width: '40px', padding: '8px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fee2e2', borderRadius: '8px', cursor: 'pointer' }}><i className="fa-solid fa-building-columns"></i></button>
+                                                    <button onClick={(e) => toggleBookmark(e, book, selectedSubCategory.title)} style={{ width: '40px', padding: '8px', background: bookmarkedGames[book] ? '#3b82f6' : '#f8fafc', color: bookmarkedGames[book] ? 'white' : '#64748b', border: bookmarkedGames[book] ? '1px solid #3b82f6' : '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer' }}>
+                                                        <i className={bookmarkedGames[book] ? "fa-solid fa-bookmark" : "fa-regular fa-bookmark"}></i>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </motion.div>

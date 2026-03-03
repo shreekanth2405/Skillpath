@@ -16,9 +16,21 @@ const connectDB = async () => {
     }
 };
 
+const cron = require('node-cron');
+const { analyzeAndNotify } = require('./schedule_notifier');
+
 app.listen(PORT, async () => {
     await connectDB();
     console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+
+    // Start background jobs
+    console.log("Initializing Cron Jobs...");
+
+    // Run Schedule Engine every 12 hours (0 */12 * * *)
+    // For immediate testing: Run every minute ('* * * * *') or leave it as a comment
+    cron.schedule('0 0,12 * * *', () => {
+        analyzeAndNotify();
+    });
 });
 
 // Handle unhandled promise rejections

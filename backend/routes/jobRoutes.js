@@ -3,7 +3,8 @@ const {
     getJobMatches,
     updateJobMatchStatus,
     getSkillGaps,
-    getTrendingJobs
+    getTrendingJobs,
+    predictAndScan
 } = require('../controllers/jobController');
 const { protect } = require('../middleware/authMiddleware'); // assuming standard auth middleware
 
@@ -24,5 +25,9 @@ router.route('/:id/apply')
 // Note: /api/v1/analysis/skill-gaps will be handled here since analysis route doesn't exist yet
 router.route('/analysis/skill-gaps')
     .get(protect, getSkillGaps);
+
+// Route: /api/v1/jobs/scan
+router.route('/scan')
+    .post(protect, predictAndScan);
 
 module.exports = router;

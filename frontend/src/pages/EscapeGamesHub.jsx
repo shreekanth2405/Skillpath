@@ -92,6 +92,24 @@ const EscapeGamesHub = ({ setActiveTab }) => {
                     </div>
                 </motion.div>
 
+                {/* Game 5: Urban Warzone */}
+                <motion.div
+                    whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(239, 68, 68, 0.4)' }}
+                    onClick={() => setActiveTab('urbanwarzone')}
+                    style={{ background: '#ffffff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '24px', padding: '3rem', cursor: 'pointer', position: 'relative', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', color: '#1e293b' }}
+                >
+                    <div style={{ position: 'absolute', top: -20, right: -20, fontSize: '12rem', opacity: 0.05, color: '#ef4444' }}>
+                        <i className="fa-solid fa-city"></i>
+                    </div>
+                    <i className="fa-solid fa-fire" style={{ fontSize: '4rem', color: '#ef4444', marginBottom: '1.5rem' }}></i>
+                    <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 1rem 0' }}>Urban Warzone</h2>
+                    <p style={{ fontSize: '1.1rem', lineHeight: 1.6 }}>Deploy cyber-defenses and hack your way through the Neon City grid. Strategic logic battles in a hostile 3D environment.</p>
+                    <div style={{ marginTop: '2.5rem', display: 'flex', gap: '10px' }}>
+                        <span style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', padding: '8px 15px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700 }}><i className="fa-solid fa-shield-halved"></i> Cyber Defense</span>
+                        <span style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', padding: '8px 15px', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 700 }}><i className="fa-solid fa-city"></i> Neon Grid</span>
+                    </div>
+                </motion.div>
+
             </div>
         </div>
     );
