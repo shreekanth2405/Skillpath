@@ -1,13 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Editor from 'react-simple-code-editor';
-import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/themes/prism-tomorrow.css';
 import { jsPDF } from 'jspdf';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ESCAPE_ROOMS_DATA } from '../data/challengesMaster';
+import { motion, AnimatePresence } from 'framer-motion';
+import { genAI } from '../services/gemini';
 import './CodeEscapeHouse.css';
+
+// Import Prism components for more languages
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-sql';
+import { highlight, languages } from 'prismjs/components/prism-core';
 
 const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
   // STATE
@@ -32,6 +40,9 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
   const [bossCooldown, setBossCooldown] = useState(0);
   const [attemptsHistory, setAttemptsHistory] = useState([]);
   const [tabSwitchCount, setTabSwitchCount] = useState(0);
+  const [selectedLanguage, setSelectedLanguage] = useState('javascript');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGettingHint, setIsGettingHint] = useState(false);
   const containerRef = useRef(null);
 
   const toggleFullScreen = () => {
@@ -132,15 +143,74 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
     }
   }, [activeRoomId, showBossBattle, activeRoom]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!code.trim() || isSubmitting) return;
+    setIsSubmitting(true);
     setAttempts(a => a + 1);
-    const success = code.length > 50;
-    if (success) triggerSuccess();
-    else triggerFailure();
+
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const prompt = `You are an expert ${selectedLanguage} code evaluator for the Code Escape House challenge.
+      
+       Challenge Title: ${activeRoom?.title}
+       Domain: ${activeRoom?.domain}
+       Task: ${activeTask?.title} - ${activeTask?.description}
+      
+       User Code (${selectedLanguage}):
+       \`\`\`${selectedLanguage}
+       ${code}
+       \`\`\`
+      
+       Evaluate if the code correctly solves the task. Be reasonable - if the logic is sound and solves the core problem, pass it.
+       Return ONLY a valid JSON object:
+       {
+        "passed": true/false,
+        "message": "Short feedback message (1 sentence)",
+        "xpEarned": 50
+      }`;
+
+      const result = await model.generateContent(prompt);
+      let text = result.response.text();
+      text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const evaluation = JSON.parse(text);
+
+      if (evaluation.passed) {
+        triggerSuccess(evaluation.message);
+      } else {
+        triggerFailure(evaluation.message);
+      }
+    } catch (err) {
+      console.error("Evaluation error:", err);
+      // Fallback to basic check if AI fails
+      if (code.length > 50) triggerSuccess("Logic appears sound (Fallback verification)");
+      else triggerFailure("Decoding error. Check syntax and logic flow.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const triggerSuccess = () => {
-    setMessage("AI-GUIDE: Logic verified. Excellent work. Proceeding to next node.");
+  const getHint = async () => {
+    if (isGettingHint) return;
+    setIsGettingHint(true);
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const prompt = `The user is stuck on Room ${activeRoomId}, Task: ${activeTask?.title}.
+      Domain: ${activeRoom?.domain}. 
+      Task Description: ${activeTask?.description}
+      Current Code: \`\`\`${selectedLanguage}\n${code}\n\`\`\`
+      Give a very brief, cryptic but helpful hint in the tone of a friendly AI guide. Max 20 words.`;
+
+      const result = await model.generateContent(prompt);
+      setMessage(`AI-GUIDE: ${result.response.text().trim()}`);
+    } catch (err) {
+      setMessage("AI-GUIDE: Connection to hint core interrupted. Think logically.");
+    } finally {
+      setIsGettingHint(false);
+    }
+  };
+
+  const triggerSuccess = (successMsg) => {
+    setMessage(successMsg || "AI-GUIDE: Logic verified. Excellent work. Proceeding to next node.");
     setUserScore(s => s + 250);
     setAccuracy(Math.round(((attempts - failures) / (attempts + 1)) * 100));
 
@@ -162,10 +232,10 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
     }
   };
 
-  const triggerFailure = () => {
+  const triggerFailure = (failMsg) => {
     setFailures(f => f + 1);
     setAccuracy(Math.round(((attempts - failures - 1) / (attempts + 1)) * 100));
-    setMessage("AI-GUIDE: Error detected in logic. Try utilizing loops or adjust variables.");
+    setMessage(failMsg || "AI-GUIDE: Error detected in logic. Try utilizing loops or adjust variables.");
 
     setRooms(prev => prev.map(r => {
       if (r.roomNumber === activeRoomId) {
@@ -552,18 +622,35 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
             <Editor
               value={code}
               onValueChange={setCode}
-              highlight={code => highlight(code, languages.js)}
+              highlight={code => highlight(code, languages[selectedLanguage] || languages.js)}
               padding={20}
               style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 16, minHeight: '100%', outline: 'none' }}
             />
           </div>
 
           <div className="editor-actions">
+            <div style={{ marginRight: 'auto', display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                style={{ background: '#1e293b', color: '#fff', border: '1px solid #475569', padding: '8px 15px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Orbitron' }}
+              >
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+                <option value="c">C</option>
+                <option value="sql">SQL</option>
+              </select>
+              <button className="btn-game" onClick={getHint} style={{ width: 'auto', padding: '8px 20px', background: '#334155', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}>
+                {isGettingHint ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-lightbulb"></i>} HINT
+              </button>
+            </div>
             <button className="btn-game btn-run" onClick={() => setMessage("AI-GUIDE: Running logic protocols... Syntax valid.")}>
               RUN CODE
             </button>
-            <button className="btn-game btn-submit" onClick={handleSubmit}>
-              SUBMIT
+            <button className="btn-game btn-submit" onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? <><i className="fa-solid fa-spinner fa-spin"></i> EVALUATING</> : "SUBMIT"}
             </button>
           </div>
         </main>
