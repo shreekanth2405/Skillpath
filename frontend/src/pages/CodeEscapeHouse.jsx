@@ -11,18 +11,8 @@ import './CodeEscapeHouse.css';
 
 const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
   // STATE
-  const [rooms, setRooms] = useState(() => {
-    return Array.from({ length: 36 }, (_, i) => ({
-      id: i + 1,
-      domain: (i + 1) % 6 === 0 ? "Boss Dimension" : ESCAPE_ROOMS_DATA[i % ESCAPE_ROOMS_DATA.length]?.domain || `Sector ${i + 1}`,
-      unlocked: i === 0,
-      completed: false,
-      progress: 0,
-      isBoss: (i + 1) % 6 === 0,
-      doubleUnlockEligible: true,
-      failedAttempt: false
-    }));
-  });
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [activeRoomId, setActiveRoomId] = useState(1);
   const [activeTaskId, setActiveTaskId] = useState(0);
@@ -52,10 +42,7 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
     }
   };
 
-  const activeRoom = rooms.find(r => r.id === activeRoomId);
-  const activeRoomData = ESCAPE_ROOMS_DATA.find(r => r.id === activeRoomId) || ESCAPE_ROOMS_DATA[0];
-  const activeRoomTasks = activeRoomData?.tasks || Array.from({ length: 10 }).map((_, i) => ({ title: `Task ${i + 1}` }));
-  const activeTask = activeRoomTasks[activeTaskId];
+
 
   // Tab Switching Detection
   useEffect(() => {
@@ -70,19 +57,69 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
   }, [showBossBattle]);
 
   useEffect(() => {
-    const t = setInterval(() => setTime(s => s + 1), 1000);
-    return () => clearInterval(t);
+    fetchLabs();
   }, []);
 
-  useEffect(() => {
-    let bt;
-    if (showBossBattle && bossTimer > 0) {
-      bt = setInterval(() => setBossTimer(s => s - 1), 1000);
-    } else if (bossTimer === 0 && showBossBattle) {
-      handleBossSubmit();
+  const fetchLabs = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/v1/labs`);
+      const data = await response.json();
+
+      const token = localStorage.getItem('token');
+      let submissions = [];
+      if (token) {
+        const subRes = await fetch(`${import.meta.env.VITE_API_URL}/v1/labs/my-submissions`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const subData = await subRes.json();
+        submissions = subData.data || [];
+      }
+
+      const labs = data.data.sort((a, b) => a.roomNumber - b.roomNumber);
+
+      const mappedRooms = labs.map((l, i) => {
+        const isCompleted = submissions.some(s => s.labId === l.id && s.status === 'Completed');
+        // A room is unlocked if it's the first one OR if the previous one is completed
+        let isUnlocked = i === 0 || submissions.some(s => {
+          const prevLab = labs[i - 1];
+          return prevLab && s.labId === prevLab.id && s.status === 'Completed';
+        });
+
+        return {
+          ...l,
+          id: l.id,
+          roomNumber: l.roomNumber,
+          domain: l.domain,
+          unlocked: isUnlocked,
+          completed: isCompleted,
+          isBoss: l.roomNumber % 10 === 0,
+          doubleUnlockEligible: true,
+          failedAttempt: false
+        };
+      });
+
+      setRooms(mappedRooms);
+      setLoading(false);
+
+      // Set active room to the first incomplete unlocked room
+      const firstActive = mappedRooms.find(r => r.unlocked && !r.completed) || mappedRooms[0];
+      if (firstActive) setActiveRoomId(firstActive.roomNumber);
+
+    } catch (err) {
+      console.error("Failed to fetch labs", err);
+      setLoading(false);
     }
-    return () => clearInterval(bt);
-  }, [showBossBattle, bossTimer]);
+  };
+
+  const activeRoom = rooms.find(r => r.roomNumber === activeRoomId);
+  const activeRoomTasks = activeRoom?.tasks || [];
+  const activeTask = activeRoomTasks[activeTaskId];
+
+  useEffect(() => {
+    if (activeTask && !showBossBattle) {
+      setCode(activeRoom?.starterCode || `// HOUSE ${activeRoomId} - TASK ${activeTaskId + 1}\n// MISSION: ${activeTask.title}\n\nfunction solve() {\n  // Code synthesis required...\n  return "decrypt_key";\n}`);
+    }
+  }, [activeRoomId, activeTaskId, showBossBattle, activeRoom]);
 
   useEffect(() => {
     if (activeRoom?.isBoss && activeRoom.unlocked && !activeRoom.completed && !showBossBattle) {
@@ -90,16 +127,10 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
       setTimeout(() => {
         setShowBossBattle(true);
         setBossTimer(1800);
-        setCode(`// BOSS CHALLENGE - ${activeRoom.id / 6}\n// OBJECTIVE: Build a secure hashing function and pass all 20 test cases.\n\nfunction bossSolve(input) {\n  // Implement high-efficiency logic...\n  return input;\n}`);
+        setCode(`// BOSS CHALLENGE Room ${activeRoomId}\n// OBJECTIVE: Build a secure hashing function and pass all 20 test cases.\n\nfunction bossSolve(input) {\n  // Implement high-efficiency logic...\n  return input;\n}`);
       }, 1500);
     }
-  }, [activeRoomId, showBossBattle]);
-
-  useEffect(() => {
-    if (activeTask && !showBossBattle) {
-      setCode(`// HOUSE ${activeRoomId} - TASK ${activeTaskId + 1}\n// MISSION: ${activeTask.title}\n\nfunction solve() {\n  // Code synthesis required...\n  return "decrypt_key";\n}`);
-    }
-  }, [activeRoomId, activeTaskId, showBossBattle]);
+  }, [activeRoomId, showBossBattle, activeRoom]);
 
   const handleSubmit = () => {
     setAttempts(a => a + 1);
@@ -114,7 +145,7 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
     setAccuracy(Math.round(((attempts - failures) / (attempts + 1)) * 100));
 
     setRooms(prev => prev.map(r => {
-      if (r.id === activeRoomId) {
+      if (r.roomNumber === activeRoomId) {
         if (r.failedAttempt) {
           return { ...r, failedAttempt: false };
         } else {
@@ -137,7 +168,7 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
     setMessage("AI-GUIDE: Error detected in logic. Try utilizing loops or adjust variables.");
 
     setRooms(prev => prev.map(r => {
-      if (r.id === activeRoomId) {
+      if (r.roomNumber === activeRoomId) {
         return { ...r, failedAttempt: true, doubleUnlockEligible: false };
       }
       return r;
@@ -148,16 +179,31 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
     setTimeout(() => el?.classList.remove('shake-ui'), 500);
   };
 
-  const triggerRoomCompletion = () => {
+  const triggerRoomCompletion = async () => {
     const isActuallyDouble = activeRoom.failedAttempt ? false : activeRoom.doubleUnlockEligible;
-    const newCompletedCount = completedRoomsCount + 1;
+    const token = localStorage.getItem('token');
 
-    setRooms(prev => prev.map(r => {
-      if (r.id === activeRoomId) return { ...r, completed: true };
-      if (r.id === activeRoomId + 1) return { ...r, unlocked: true };
-      if (isActuallyDouble && r.id === activeRoomId + 2) return { ...r, unlocked: true };
-      return r;
-    }));
+    if (token) {
+      try {
+        await fetch(`${import.meta.env.VITE_API_URL}/v1/labs/${activeRoom.id}/submit`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            code,
+            status: 'Completed',
+            notes: `Completed room ${activeRoomId}`
+          })
+        });
+
+        // Refresh rooms to update unlock status
+        await fetchLabs();
+      } catch (err) {
+        console.error("Failed to submit lab", err);
+      }
+    }
 
     setShowKeyAnim({ show: true, isDouble: isActuallyDouble });
   };
@@ -201,7 +247,7 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
     doc.setFontSize(16);
     doc.text("CERTIFICATE OF MASTERY", 105, 80, { align: "center" });
     doc.text(`SCORE: ${userScore}`, 105, 120, { align: "center" });
-    doc.text(`HOUSES SECURED: ${rooms.filter(r => r.completed).length}/30`, 105, 140, { align: "center" });
+    doc.text(`HOUSES SECURED: ${rooms.filter(r => r.completed).length}/120`, 105, 140, { align: "center" });
     doc.text(`ACCURACY: ${accuracy}%`, 105, 160, { align: "center" });
 
     doc.save("Code_Escape_House_Report.pdf");
@@ -442,7 +488,7 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
         <div className="top-stats">
           <div className="stat-item"><i className="fa-solid fa-star"></i> Level <span className="stat-val">{level}</span></div>
           <div className="stat-item"><i className="fa-solid fa-gem"></i> Score <span className="stat-val">{userScore}</span></div>
-          <div className="stat-item"><i className="fa-solid fa-house-lock"></i> Unlocked <span className="stat-val">{completedRoomsCount}/30</span></div>
+          <div className="stat-item"><i className="fa-solid fa-house-lock"></i> Unlocked <span className="stat-val">{completedRoomsCount}/120</span></div>
           <div className="stat-item"><i className="fa-solid fa-network-wired"></i> Domain <span className="stat-val" style={{ color: '#ffffff' }}>{activeRoom?.domain.toUpperCase()}</span></div>
         </div>
         <div className="top-actions" style={{ display: 'flex', gap: '20px' }}>

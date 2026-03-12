@@ -32,6 +32,7 @@ model User {
   testResults             TestResult[]
   resumes                 Resume[]
   bookmarks               Bookmark[]
+  labSubmissions          LabSubmission[]
   
   // Events
   createdEvents           Event[]              @relation("EventCreator")
@@ -188,4 +189,34 @@ model Certification {
   level       String
   link        String
   createdAt   DateTime @default(now())
+}
+model Lab {
+  id              String   @id @default(uuid())
+  roomNumber      Int      @unique
+  title           String
+  description     String
+  domain          String   // e.g., 'Web Development', 'Data Science', 'Networking', 'Cybersecurity'
+  difficulty      String   // e.g., 'Beginner', 'Intermediate', 'Advanced'
+  instructions    String?  @db.Text
+  tasks           Json?    // Array of tasks/steps
+  starterCode     String?  @db.Text
+  solution        String?  @db.Text
+  xpReward        Int      @default(150)
+  createdAt       DateTime @default(now())
+
+  submissions     LabSubmission[]
+}
+
+model LabSubmission {
+  id              String   @id @default(uuid())
+  labId           String
+  userId          String
+  status          String   @default("Pending") // Pending, Completed, Failed
+  code            String?  @db.Text
+  notes           String?  @db.Text
+  feedback        String?
+  createdAt       DateTime @default(now())
+
+  lab             Lab      @relation(fields: [labId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

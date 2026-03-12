@@ -77,6 +77,7 @@ app.use('/api/v1/resumes', require('./routes/resumeRoutes'));
 app.use('/api/v1/bookmarks', require('./routes/bookmarkRoutes'));
 app.use('/api/v1/events', require('./routes/eventRoutes'));
 app.use('/api/v1/certifications', require('./routes/certificationRoutes'));
+app.use('/api/v1/labs', require('./routes/labRoutes'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {

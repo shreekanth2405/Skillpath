@@ -111,11 +111,15 @@ frontend
 backend
 ├── .env
 ├── .gitignore
+├── add_admin.js
 ├── app.js
 ├── controllers
 │   ├── authController.js
+│   ├── bookmarkController.js
+│   ├── certificationController.js
 │   ├── communicationController.js
 │   ├── dashboardController.js
+│   ├── eventController.js
 │   ├── habitController.js
 │   ├── jobController.js
 │   ├── resumeController.js
@@ -131,13 +135,17 @@ backend
 ├── prismaClient.js
 ├── routes
 │   ├── authRoutes.js
+│   ├── bookmarkRoutes.js
+│   ├── certificationRoutes.js
 │   ├── communicationRoutes.js
 │   ├── dashboardRoutes.js
+│   ├── eventRoutes.js
 │   ├── habitRoutes.js
 │   ├── jobRoutes.js
 │   ├── resumeRoutes.js
 │   ├── testSystemRoutes.js
 │   └── userRoutes.js
+├── schedule_notifier.js
 ├── seed_admin.js
 ├── seed_jobs.js
 ├── server.js
@@ -146,17 +154,19 @@ backend
 └── utils
     └── generateToken.js
 ```
-**Backend Total Files:** 31
+**Backend Total Files:** 39
 
 ## 📁 Root Directory Files
 ```
 main_project
 ├── .gitignore
+├── ai_matcher.py
 ├── AI_Smart_Job_Tracker_Architecture.md
 ├── all_files_list.txt
 ├── COMMUNICATION_ASSISTANT_PLAN.md
 ├── Desktop - Shortcut.lnk
 ├── env_watcher.js
+├── FILE_TREE_STRUCTURE.md
 ├── fix.cjs
 ├── fix_dashboard.js
 ├── generate_tree.js
@@ -165,11 +175,13 @@ main_project
 ├── main_project - Copy.code-workspace
 ├── PROJECT_STRUCTURE.md
 ├── README.md
+├── scraper.py
 ├── setup_backend.js
 ├── setup_supabase.ps1
+├── SKILLPATH_SYSTEM_ARCHITECTURE.md
 └── start_all.ps1
 ```
-**Root Total Files:** 17
+**Root Total Files:** 21
 
 ---
-**Total Files in Project:** 136
+**Total Files in Project:** 148
