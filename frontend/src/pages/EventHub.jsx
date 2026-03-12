@@ -34,6 +34,15 @@ const EVENTS = [
         speakers: ['Scott Belsky', 'Ivy Ross'],
     },
     {
+        id: 7, title: 'Code Escape House: Practical Mastery', organizer: 'SkillPark AI',
+        date: '2026-03-20', time: '09:00 AM EST', mode: 'Online', type: 'Workshop',
+        category: 'AI & Tech', price: 'Free', attendees: 15600, recommended: true,
+        tag: '120 Rooms', color: '#8b5cf6',
+        image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
+        desc: 'Enter the virtual house of 120 rooms. Solve practical coding labs across 12 domains to unlock your potential and earn exclusive badges.',
+        speakers: ['AI Guide', 'Cyber Overlord'],
+    },
+    {
         id: 4, title: 'Cloud Architecture Masterclass', organizer: 'Amazon Web Services',
         date: '2026-03-28', time: '11:00 AM PST', mode: 'Online', type: 'Certification',
         category: 'AI & Tech', price: 'Paid', attendees: 3200, recommended: false,
