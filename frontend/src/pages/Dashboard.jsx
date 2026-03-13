@@ -171,6 +171,48 @@ const Dashboard = ({ setActiveTab, userXP, userLevel, userCoins, user }) => {
 
                     </motion.div>
 
+                    {/* PRACTICAL HUB LAUNCH CARD */}
+                    <motion.div variants={itemVariants} whileHover={{ boxShadow: '0 25px 50px -12px rgba(59, 130, 246, 0.2)', y: -3 }}
+                        onClick={() => setActiveTab('practical')}
+                        style={{ gridColumn: 'span 12', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%)', padding: '2rem 2.5rem', borderRadius: '24px', cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'all 0.3s ease' }}>
+                        <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.15), transparent)', pointerEvents: 'none' }}></div>
+                        <div style={{ position: 'absolute', bottom: '-30px', left: '40%', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1), transparent)', pointerEvents: 'none' }}></div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.6rem', color: 'white' }}>
+                                    <i className="fa-solid fa-flask-vial"></i>
+                                </div>
+                                <div>
+                                    <h3 style={{ color: 'white', fontSize: '1.5rem', fontWeight: 900, margin: '0 0 4px 0' }}>
+                                        <i className="fa-solid fa-sparkles" style={{ color: '#f59e0b', marginRight: '8px' }}></i>
+                                        Practical Hub — Hands-On Labs
+                                    </h3>
+                                    <p style={{ color: '#94a3b8', fontSize: '0.95rem', margin: 0 }}>
+                                        Explore 240+ labs across 8 domains: Web Dev, AI/ML, Data Science, Cybersecurity, Cloud, Mobile, Blockchain & Game Dev
+                                    </p>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                                {[
+                                    { icon: 'fa-globe', label: 'Web', color: '#3b82f6' },
+                                    { icon: 'fa-brain', label: 'AI', color: '#8b5cf6' },
+                                    { icon: 'fa-shield-halved', label: 'Sec', color: '#ef4444' },
+                                    { icon: 'fa-cloud', label: 'Cloud', color: '#f59e0b' },
+                                ].map((d, i) => (
+                                    <div key={i} style={{ textAlign: 'center' }}>
+                                        <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', color: d.color, margin: '0 auto 4px' }}>
+                                            <i className={`fa-solid ${d.icon}`}></i>
+                                        </div>
+                                        <span style={{ color: '#64748b', fontSize: '0.65rem', fontWeight: 700 }}>{d.label}</span>
+                                    </div>
+                                ))}
+                                <div style={{ background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: 'white', padding: '12px 24px', borderRadius: '14px', fontWeight: 800, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    Launch <i className="fa-solid fa-arrow-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+
                     {/* CHART: Market Demand */}
                     <motion.div variants={itemVariants} whileHover={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)' }}
                         style={{ gridColumn: 'span 6', background: '#fff', padding: '2rem', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)', transition: 'all 0.3s ease' }}>

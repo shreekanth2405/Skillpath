@@ -39,6 +39,7 @@ import CareerHub from './pages/CareerHub';
 
 import CodeReviewer from './pages/CodeReviewer';
 import CommunityHub from './pages/CommunityHub';
+import PracticalHub from './pages/PracticalHub';
 import TrendingSection from './pages/TrendingSection';
 import AiRecommendations from './pages/AiRecommendations';
 import TrendingSkills from './pages/TrendingSkills';
@@ -304,6 +305,7 @@ function MainApp() {
       <Route path="/market-vulnerability" element={<ProtectedLayout><MarketVulnerability /></ProtectedLayout>} />
       <Route path="/events" element={<ProtectedLayout><EventHub /></ProtectedLayout>} />
       <Route path="/ai-confidence" element={<ProtectedLayout><AiConfidenceScore /></ProtectedLayout>} />
+      <Route path="/practical" element={<ProtectedLayout><PracticalHub /></ProtectedLayout>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

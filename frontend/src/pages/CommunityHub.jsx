@@ -399,8 +399,6 @@ const CommunityHub = () => {
                 </div>
 
             </div>
-        </div>
-
             {/* Create Post Modal */}
             <AnimatePresence>
                 {showCreateModal && (
