@@ -105,6 +105,7 @@ const Header = ({
             { id: 'dashboard', label: 'Main Dashboard', icon: 'fa-house', desc: 'Central command & overview' },
             { id: 'learning', label: 'Learning Hub', icon: 'fa-book-open', desc: '1000+ courses & tutorials' },
             { id: 'career', label: 'Career Hub', icon: 'fa-briefcase', desc: 'Resumes, trackers, roadmaps' },
+            { id: 'practical', label: 'Practical Hub', icon: 'fa-flask-vial', desc: '500+ hands-on labs' },
             { id: 'learning/paths', label: 'AI Skill Path Editor', icon: 'fa-road', desc: 'Generate custom curricula' },
         ],
         'Communication & Growth': [

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
-// ─── Domain Data ───
-const domains = [
+// ─── Shared Data (Static fallback) ───
+const PRACTICAL_DOMAINS = [
     {
         id: 'webdev',
         name: 'Web Development',
@@ -11,14 +12,7 @@ const domains = [
         color: '#3b82f6',
         description: 'Build modern, responsive web applications',
         stats: { labs: 42, projects: 18, users: '12.5k' },
-        labs: [
-            { id: 1, title: 'Build a React Dashboard', difficulty: 'Intermediate', xp: 500, duration: '2h', tech: ['React', 'CSS', 'Chart.js'], completion: 72, status: 'popular' },
-            { id: 2, title: 'REST API with Express & Prisma', difficulty: 'Advanced', xp: 750, duration: '3h', tech: ['Node.js', 'Express', 'PostgreSQL'], completion: 45, status: 'new' },
-            { id: 3, title: 'Responsive Landing Page', difficulty: 'Beginner', xp: 200, duration: '1h', tech: ['HTML', 'CSS', 'JS'], completion: 91, status: 'hot' },
-            { id: 4, title: 'Full-Stack Auth System', difficulty: 'Advanced', xp: 800, duration: '4h', tech: ['JWT', 'bcrypt', 'React'], completion: 34, status: 'new' },
-            { id: 5, title: 'Next.js E-Commerce Store', difficulty: 'Expert', xp: 1200, duration: '6h', tech: ['Next.js', 'Stripe', 'Tailwind'], completion: 18, status: 'featured' },
-            { id: 6, title: 'CSS Grid & Flexbox Mastery', difficulty: 'Beginner', xp: 150, duration: '45m', tech: ['CSS', 'HTML'], completion: 88, status: 'popular' },
-        ]
+        labs: [] // Fetched dynamically
     },
     {
         id: 'aiml',
@@ -28,14 +22,7 @@ const domains = [
         color: '#8b5cf6',
         description: 'Train models and build intelligent systems',
         stats: { labs: 35, projects: 15, users: '9.8k' },
-        labs: [
-            { id: 1, title: 'Build a Sentiment Analyzer', difficulty: 'Intermediate', xp: 600, duration: '2.5h', tech: ['Python', 'NLTK', 'Flask'], completion: 58, status: 'popular' },
-            { id: 2, title: 'Image Classification with CNN', difficulty: 'Advanced', xp: 900, duration: '4h', tech: ['TensorFlow', 'Keras', 'Python'], completion: 32, status: 'featured' },
-            { id: 3, title: 'Chatbot with LangChain', difficulty: 'Advanced', xp: 850, duration: '3.5h', tech: ['LangChain', 'OpenAI', 'Python'], completion: 41, status: 'hot' },
-            { id: 4, title: 'Linear Regression from Scratch', difficulty: 'Beginner', xp: 250, duration: '1.5h', tech: ['Python', 'NumPy'], completion: 85, status: 'popular' },
-            { id: 5, title: 'RAG Pipeline with Vector DB', difficulty: 'Expert', xp: 1100, duration: '5h', tech: ['Pinecone', 'LangChain', 'GPT-4'], completion: 15, status: 'new' },
-            { id: 6, title: 'Object Detection with YOLO', difficulty: 'Advanced', xp: 950, duration: '4h', tech: ['YOLO', 'OpenCV', 'Python'], completion: 28, status: 'new' },
-        ]
+        labs: []
     },
     {
         id: 'datascience',
@@ -45,14 +32,7 @@ const domains = [
         color: '#10b981',
         description: 'Analyze data and create powerful visualizations',
         stats: { labs: 38, projects: 20, users: '11.2k' },
-        labs: [
-            { id: 1, title: 'Exploratory Data Analysis', difficulty: 'Beginner', xp: 300, duration: '2h', tech: ['Pandas', 'Matplotlib', 'Python'], completion: 82, status: 'popular' },
-            { id: 2, title: 'Sales Prediction Model', difficulty: 'Intermediate', xp: 550, duration: '3h', tech: ['Scikit-learn', 'Pandas', 'Seaborn'], completion: 55, status: 'hot' },
-            { id: 3, title: 'Dashboard with Streamlit', difficulty: 'Intermediate', xp: 500, duration: '2.5h', tech: ['Streamlit', 'Plotly', 'Python'], completion: 63, status: 'featured' },
-            { id: 4, title: 'Web Scraping Pipeline', difficulty: 'Intermediate', xp: 450, duration: '2h', tech: ['BeautifulSoup', 'Selenium', 'Python'], completion: 70, status: 'popular' },
-            { id: 5, title: 'Time Series Forecasting', difficulty: 'Advanced', xp: 800, duration: '4h', tech: ['Prophet', 'ARIMA', 'Python'], completion: 30, status: 'new' },
-            { id: 6, title: 'Big Data with PySpark', difficulty: 'Expert', xp: 1000, duration: '5h', tech: ['PySpark', 'Hadoop', 'SQL'], completion: 20, status: 'new' },
-        ]
+        labs: []
     },
     {
         id: 'cybersecurity',
@@ -62,14 +42,7 @@ const domains = [
         color: '#ef4444',
         description: 'Defend systems and learn ethical hacking',
         stats: { labs: 30, projects: 12, users: '7.3k' },
-        labs: [
-            { id: 1, title: 'XSS Attack & Prevention', difficulty: 'Intermediate', xp: 600, duration: '2h', tech: ['JavaScript', 'HTML', 'Security'], completion: 65, status: 'hot' },
-            { id: 2, title: 'SQL Injection Lab', difficulty: 'Beginner', xp: 350, duration: '1.5h', tech: ['SQL', 'Python', 'Security'], completion: 78, status: 'popular' },
-            { id: 3, title: 'Network Packet Analysis', difficulty: 'Advanced', xp: 800, duration: '3h', tech: ['Wireshark', 'TCP/IP', 'Linux'], completion: 35, status: 'featured' },
-            { id: 4, title: 'Password Cracking & Hashing', difficulty: 'Intermediate', xp: 500, duration: '2h', tech: ['bcrypt', 'hashcat', 'Python'], completion: 55, status: 'popular' },
-            { id: 5, title: 'Capture The Flag Challenge', difficulty: 'Advanced', xp: 900, duration: '4h', tech: ['CTF', 'Linux', 'Crypto'], completion: 25, status: 'hot' },
-            { id: 6, title: 'Reverse Engineering Binaries', difficulty: 'Expert', xp: 1200, duration: '6h', tech: ['Ghidra', 'Assembly', 'C'], completion: 12, status: 'new' },
-        ]
+        labs: []
     },
     {
         id: 'cloud',
@@ -79,14 +52,7 @@ const domains = [
         color: '#f59e0b',
         description: 'Deploy, scale, and automate infrastructure',
         stats: { labs: 28, projects: 14, users: '8.1k' },
-        labs: [
-            { id: 1, title: 'Docker Container Basics', difficulty: 'Beginner', xp: 300, duration: '1.5h', tech: ['Docker', 'Linux', 'CLI'], completion: 80, status: 'popular' },
-            { id: 2, title: 'CI/CD with GitHub Actions', difficulty: 'Intermediate', xp: 550, duration: '2.5h', tech: ['GitHub Actions', 'YAML', 'Node.js'], completion: 60, status: 'hot' },
-            { id: 3, title: 'Deploy to AWS EC2', difficulty: 'Intermediate', xp: 600, duration: '2h', tech: ['AWS', 'SSH', 'Nginx'], completion: 50, status: 'featured' },
-            { id: 4, title: 'Kubernetes Orchestration', difficulty: 'Advanced', xp: 900, duration: '4h', tech: ['K8s', 'Docker', 'Helm'], completion: 28, status: 'new' },
-            { id: 5, title: 'Infrastructure as Code', difficulty: 'Advanced', xp: 800, duration: '3.5h', tech: ['Terraform', 'AWS', 'HCL'], completion: 32, status: 'new' },
-            { id: 6, title: 'Monitoring with Grafana', difficulty: 'Intermediate', xp: 500, duration: '2h', tech: ['Grafana', 'Prometheus', 'Docker'], completion: 45, status: 'popular' },
-        ]
+        labs: []
     },
     {
         id: 'mobile',
@@ -96,14 +62,7 @@ const domains = [
         color: '#06b6d4',
         description: 'Build native & cross-platform mobile apps',
         stats: { labs: 25, projects: 10, users: '6.5k' },
-        labs: [
-            { id: 1, title: 'React Native Todo App', difficulty: 'Beginner', xp: 300, duration: '2h', tech: ['React Native', 'Expo', 'JS'], completion: 75, status: 'popular' },
-            { id: 2, title: 'Flutter Weather App', difficulty: 'Intermediate', xp: 500, duration: '3h', tech: ['Flutter', 'Dart', 'API'], completion: 55, status: 'hot' },
-            { id: 3, title: 'SwiftUI Instagram Clone', difficulty: 'Advanced', xp: 850, duration: '5h', tech: ['SwiftUI', 'Firebase', 'iOS'], completion: 22, status: 'featured' },
-            { id: 4, title: 'Kotlin Chat App', difficulty: 'Advanced', xp: 800, duration: '4h', tech: ['Kotlin', 'Firebase', 'Android'], completion: 30, status: 'new' },
-            { id: 5, title: 'Push Notifications System', difficulty: 'Intermediate', xp: 450, duration: '2h', tech: ['FCM', 'React Native', 'Node.js'], completion: 48, status: 'popular' },
-            { id: 6, title: 'Offline-First App with SQLite', difficulty: 'Intermediate', xp: 550, duration: '2.5h', tech: ['SQLite', 'React Native', 'Redux'], completion: 40, status: 'new' },
-        ]
+        labs: []
     },
     {
         id: 'blockchain',
@@ -111,257 +70,34 @@ const domains = [
         icon: 'fa-link',
         gradient: 'linear-gradient(135deg, #6366f1, #a855f7)',
         color: '#6366f1',
-        description: 'Build decentralized applications & smart contracts',
+        description: 'Build decentralized applications',
         stats: { labs: 20, projects: 8, users: '4.2k' },
-        labs: [
-            { id: 1, title: 'Solidity Smart Contracts', difficulty: 'Intermediate', xp: 600, duration: '3h', tech: ['Solidity', 'Hardhat', 'Ethereum'], completion: 50, status: 'popular' },
-            { id: 2, title: 'NFT Marketplace dApp', difficulty: 'Advanced', xp: 1000, duration: '5h', tech: ['React', 'ethers.js', 'IPFS'], completion: 25, status: 'featured' },
-            { id: 3, title: 'DeFi Token Swap', difficulty: 'Expert', xp: 1200, duration: '6h', tech: ['Uniswap', 'Solidity', 'Web3'], completion: 15, status: 'hot' },
-            { id: 4, title: 'Wallet Integration', difficulty: 'Beginner', xp: 250, duration: '1.5h', tech: ['MetaMask', 'ethers.js', 'React'], completion: 70, status: 'popular' },
-            { id: 5, title: 'DAO Governance System', difficulty: 'Advanced', xp: 900, duration: '4h', tech: ['Solidity', 'OpenZeppelin', 'React'], completion: 18, status: 'new' },
-            { id: 6, title: 'Cross-Chain Bridge', difficulty: 'Expert', xp: 1500, duration: '8h', tech: ['Solidity', 'LayerZero', 'Rust'], completion: 8, status: 'new' },
-        ]
-    },
-    {
-        id: 'gamedev',
-        name: 'Game Development',
-        icon: 'fa-gamepad',
-        gradient: 'linear-gradient(135deg, #ec4899, #f43f5e)',
-        color: '#ec4899',
-        description: 'Create immersive games and interactive experiences',
-        stats: { labs: 22, projects: 9, users: '5.8k' },
-        labs: [
-            { id: 1, title: '2D Platformer with Phaser.js', difficulty: 'Beginner', xp: 350, duration: '2.5h', tech: ['Phaser.js', 'JavaScript', 'HTML5'], completion: 68, status: 'popular' },
-            { id: 2, title: 'Unity 3D FPS Controller', difficulty: 'Intermediate', xp: 600, duration: '3h', tech: ['Unity', 'C#', '3D'], completion: 45, status: 'hot' },
-            { id: 3, title: 'RPG Inventory System', difficulty: 'Advanced', xp: 800, duration: '4h', tech: ['Unity', 'C#', 'UI'], completion: 30, status: 'featured' },
-            { id: 4, title: 'Multiplayer with Socket.io', difficulty: 'Advanced', xp: 900, duration: '5h', tech: ['Socket.io', 'Node.js', 'Canvas'], completion: 22, status: 'new' },
-            { id: 5, title: 'Pixel Art Animation Engine', difficulty: 'Intermediate', xp: 500, duration: '2h', tech: ['Canvas', 'JavaScript', 'Sprites'], completion: 55, status: 'popular' },
-            { id: 6, title: 'Unreal Engine Basics', difficulty: 'Beginner', xp: 400, duration: '3h', tech: ['Unreal', 'Blueprints', 'C++'], completion: 40, status: 'new' },
-        ]
-    },
-    {
-        id: 'dsa',
-        name: 'DSA & Competitive Programming',
-        icon: 'fa-code',
-        gradient: 'linear-gradient(135deg, #0891b2, #06b6d4)',
-        color: '#0891b2',
-        description: 'Master algorithms, data structures & problem solving',
-        stats: { labs: 50, projects: 25, users: '18.3k' },
-        labs: [
-            { id: 1, title: 'Array & String Problems', difficulty: 'Beginner', xp: 200, duration: '1.5h', tech: ['Arrays', 'Strings', 'Python'], completion: 90, status: 'popular' },
-            { id: 2, title: 'Binary Search Mastery', difficulty: 'Intermediate', xp: 400, duration: '2h', tech: ['Search', 'Sorting', 'C++'], completion: 68, status: 'hot' },
-            { id: 3, title: 'Dynamic Programming Patterns', difficulty: 'Advanced', xp: 800, duration: '4h', tech: ['DP', 'Memoization', 'Java'], completion: 30, status: 'featured' },
-            { id: 4, title: 'Graph Algorithms Deep Dive', difficulty: 'Advanced', xp: 750, duration: '3.5h', tech: ['BFS', 'DFS', 'Dijkstra'], completion: 28, status: 'new' },
-            { id: 5, title: 'Tree & Trie Problems', difficulty: 'Intermediate', xp: 500, duration: '2.5h', tech: ['BST', 'AVL', 'Trie'], completion: 55, status: 'popular' },
-            { id: 6, title: 'Contest Simulation (Codeforces)', difficulty: 'Expert', xp: 1500, duration: '3h', tech: ['C++', 'Optimisation', 'Math'], completion: 12, status: 'hot' },
-        ]
-    },
-    {
-        id: 'database',
-        name: 'Database & SQL',
-        icon: 'fa-database',
-        gradient: 'linear-gradient(135deg, #059669, #10b981)',
-        color: '#059669',
-        description: 'Design schemas, write queries & manage data stores',
-        stats: { labs: 32, projects: 14, users: '9.1k' },
-        labs: [
-            { id: 1, title: 'SQL Fundamentals & Joins', difficulty: 'Beginner', xp: 250, duration: '1.5h', tech: ['SQL', 'PostgreSQL', 'Joins'], completion: 88, status: 'popular' },
-            { id: 2, title: 'Database Normalization', difficulty: 'Intermediate', xp: 450, duration: '2h', tech: ['ERD', 'Schema', 'SQL'], completion: 62, status: 'hot' },
-            { id: 3, title: 'MongoDB Aggregation Pipeline', difficulty: 'Intermediate', xp: 550, duration: '2.5h', tech: ['MongoDB', 'NoSQL', 'Node.js'], completion: 50, status: 'featured' },
-            { id: 4, title: 'Redis Caching Strategies', difficulty: 'Advanced', xp: 700, duration: '3h', tech: ['Redis', 'Node.js', 'Cache'], completion: 35, status: 'new' },
-            { id: 5, title: 'Query Optimization & Indexing', difficulty: 'Advanced', xp: 800, duration: '3h', tech: ['PostgreSQL', 'EXPLAIN', 'Index'], completion: 28, status: 'new' },
-            { id: 6, title: 'GraphQL API with Prisma', difficulty: 'Intermediate', xp: 600, duration: '3h', tech: ['GraphQL', 'Prisma', 'Node.js'], completion: 42, status: 'popular' },
-        ]
-    },
-    {
-        id: 'uiux',
-        name: 'UI/UX Design',
-        icon: 'fa-palette',
-        gradient: 'linear-gradient(135deg, #e11d48, #f43f5e)',
-        color: '#e11d48',
-        description: 'Design beautiful interfaces & user experiences',
-        stats: { labs: 26, projects: 12, users: '7.8k' },
-        labs: [
-            { id: 1, title: 'Figma Prototyping Basics', difficulty: 'Beginner', xp: 200, duration: '1.5h', tech: ['Figma', 'Wireframe', 'UI'], completion: 82, status: 'popular' },
-            { id: 2, title: 'Design System from Scratch', difficulty: 'Intermediate', xp: 600, duration: '3h', tech: ['Tokens', 'Components', 'Figma'], completion: 48, status: 'featured' },
-            { id: 3, title: 'User Research & Personas', difficulty: 'Beginner', xp: 250, duration: '2h', tech: ['UX Research', 'Empathy Map', 'Surveys'], completion: 75, status: 'popular' },
-            { id: 4, title: 'Accessibility (WCAG) Audit', difficulty: 'Intermediate', xp: 500, duration: '2.5h', tech: ['A11y', 'ARIA', 'Screen Reader'], completion: 40, status: 'hot' },
-            { id: 5, title: 'Micro-Interaction Animation', difficulty: 'Advanced', xp: 750, duration: '3h', tech: ['Framer Motion', 'Lottie', 'CSS'], completion: 30, status: 'new' },
-            { id: 6, title: 'Mobile-First Responsive Design', difficulty: 'Intermediate', xp: 450, duration: '2h', tech: ['CSS', 'Media Query', 'Figma'], completion: 65, status: 'hot' },
-        ]
-    },
-    {
-        id: 'testing',
-        name: 'Testing & QA',
-        icon: 'fa-vial-circle-check',
-        gradient: 'linear-gradient(135deg, #16a34a, #22c55e)',
-        color: '#16a34a',
-        description: 'Write tests, automate QA & ensure code quality',
-        stats: { labs: 24, projects: 10, users: '5.4k' },
-        labs: [
-            { id: 1, title: 'Unit Testing with Jest', difficulty: 'Beginner', xp: 250, duration: '1.5h', tech: ['Jest', 'JavaScript', 'TDD'], completion: 78, status: 'popular' },
-            { id: 2, title: 'E2E Testing with Cypress', difficulty: 'Intermediate', xp: 500, duration: '2.5h', tech: ['Cypress', 'JavaScript', 'CI'], completion: 55, status: 'hot' },
-            { id: 3, title: 'API Testing with Postman', difficulty: 'Beginner', xp: 300, duration: '2h', tech: ['Postman', 'REST', 'Newman'], completion: 80, status: 'featured' },
-            { id: 4, title: 'Load Testing with k6', difficulty: 'Advanced', xp: 700, duration: '3h', tech: ['k6', 'Performance', 'Grafana'], completion: 25, status: 'new' },
-            { id: 5, title: 'React Testing Library', difficulty: 'Intermediate', xp: 450, duration: '2h', tech: ['RTL', 'Jest', 'React'], completion: 60, status: 'popular' },
-            { id: 6, title: 'Selenium Automation Suite', difficulty: 'Advanced', xp: 800, duration: '4h', tech: ['Selenium', 'Python', 'Grid'], completion: 22, status: 'new' },
-        ]
-    },
-    {
-        id: 'systemdesign',
-        name: 'System Design & Architecture',
-        icon: 'fa-sitemap',
-        gradient: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-        color: '#7c3aed',
-        description: 'Design scalable distributed systems',
-        stats: { labs: 20, projects: 8, users: '6.7k' },
-        labs: [
-            { id: 1, title: 'URL Shortener Design', difficulty: 'Intermediate', xp: 500, duration: '2.5h', tech: ['System Design', 'Redis', 'Node.js'], completion: 65, status: 'popular' },
-            { id: 2, title: 'Chat System Architecture', difficulty: 'Advanced', xp: 900, duration: '4h', tech: ['WebSocket', 'Kafka', 'Redis'], completion: 30, status: 'featured' },
-            { id: 3, title: 'CDN & Load Balancer Setup', difficulty: 'Advanced', xp: 800, duration: '3h', tech: ['Nginx', 'HAProxy', 'DNS'], completion: 28, status: 'hot' },
-            { id: 4, title: 'Microservices with Docker', difficulty: 'Intermediate', xp: 650, duration: '3h', tech: ['Docker', 'API Gateway', 'gRPC'], completion: 42, status: 'popular' },
-            { id: 5, title: 'Rate Limiter Implementation', difficulty: 'Intermediate', xp: 400, duration: '2h', tech: ['Token Bucket', 'Redis', 'Node.js'], completion: 55, status: 'new' },
-            { id: 6, title: 'Design Twitter at Scale', difficulty: 'Expert', xp: 1500, duration: '6h', tech: ['Fan-out', 'Cassandra', 'Timeline'], completion: 10, status: 'hot' },
-        ]
-    },
-    {
-        id: 'iot',
-        name: 'Embedded Systems & IoT',
-        icon: 'fa-microchip',
-        gradient: 'linear-gradient(135deg, #ca8a04, #eab308)',
-        color: '#ca8a04',
-        description: 'Program microcontrollers & build IoT solutions',
-        stats: { labs: 18, projects: 7, users: '3.9k' },
-        labs: [
-            { id: 1, title: 'Arduino LED Controller', difficulty: 'Beginner', xp: 200, duration: '1h', tech: ['Arduino', 'C', 'LED'], completion: 85, status: 'popular' },
-            { id: 2, title: 'Raspberry Pi Home Server', difficulty: 'Intermediate', xp: 500, duration: '3h', tech: ['Raspberry Pi', 'Linux', 'Python'], completion: 50, status: 'hot' },
-            { id: 3, title: 'MQTT Smart Sensor Network', difficulty: 'Intermediate', xp: 600, duration: '2.5h', tech: ['MQTT', 'ESP32', 'Node-RED'], completion: 40, status: 'featured' },
-            { id: 4, title: 'Edge AI with TinyML', difficulty: 'Advanced', xp: 900, duration: '4h', tech: ['TinyML', 'TensorFlow Lite', 'MCU'], completion: 18, status: 'new' },
-            { id: 5, title: 'Smart Home Dashboard', difficulty: 'Advanced', xp: 800, duration: '4h', tech: ['IoT', 'React', 'WebSocket'], completion: 22, status: 'new' },
-            { id: 6, title: 'RTOS Fundamentals', difficulty: 'Expert', xp: 1000, duration: '5h', tech: ['FreeRTOS', 'C', 'Scheduling'], completion: 12, status: 'hot' },
-        ]
-    },
-    {
-        id: 'arvr',
-        name: 'AR / VR / XR',
-        icon: 'fa-vr-cardboard',
-        gradient: 'linear-gradient(135deg, #be185d, #ec4899)',
-        color: '#be185d',
-        description: 'Build immersive augmented & virtual reality apps',
-        stats: { labs: 15, projects: 6, users: '3.2k' },
-        labs: [
-            { id: 1, title: 'Three.js 3D Scene', difficulty: 'Beginner', xp: 300, duration: '2h', tech: ['Three.js', 'WebGL', 'JavaScript'], completion: 70, status: 'popular' },
-            { id: 2, title: 'WebXR Immersive Experience', difficulty: 'Intermediate', xp: 600, duration: '3h', tech: ['WebXR', 'A-Frame', 'JavaScript'], completion: 38, status: 'hot' },
-            { id: 3, title: 'AR Product Viewer', difficulty: 'Advanced', xp: 850, duration: '4h', tech: ['AR.js', 'Three.js', 'GLTF'], completion: 22, status: 'featured' },
-            { id: 4, title: 'Unity VR Room', difficulty: 'Advanced', xp: 900, duration: '5h', tech: ['Unity', 'XR Toolkit', 'C#'], completion: 18, status: 'new' },
-            { id: 5, title: 'Spatial Audio Engine', difficulty: 'Expert', xp: 1100, duration: '5h', tech: ['Web Audio', 'HRTF', 'JavaScript'], completion: 10, status: 'new' },
-            { id: 6, title: 'Hand Tracking with MediaPipe', difficulty: 'Intermediate', xp: 550, duration: '2.5h', tech: ['MediaPipe', 'Python', 'OpenCV'], completion: 35, status: 'popular' },
-        ]
-    },
-    {
-        id: 'nlp',
-        name: 'Natural Language Processing',
-        icon: 'fa-language',
-        gradient: 'linear-gradient(135deg, #4f46e5, #818cf8)',
-        color: '#4f46e5',
-        description: 'Process text, build translators & language models',
-        stats: { labs: 22, projects: 9, users: '5.5k' },
-        labs: [
-            { id: 1, title: 'Text Preprocessing Pipeline', difficulty: 'Beginner', xp: 250, duration: '1.5h', tech: ['NLTK', 'spaCy', 'Python'], completion: 80, status: 'popular' },
-            { id: 2, title: 'Named Entity Recognition', difficulty: 'Intermediate', xp: 550, duration: '2.5h', tech: ['spaCy', 'Transformers', 'Python'], completion: 50, status: 'hot' },
-            { id: 3, title: 'Text Summarizer with BART', difficulty: 'Advanced', xp: 800, duration: '3.5h', tech: ['HuggingFace', 'BART', 'PyTorch'], completion: 28, status: 'featured' },
-            { id: 4, title: 'Question Answering System', difficulty: 'Advanced', xp: 850, duration: '4h', tech: ['BERT', 'SQuAD', 'Python'], completion: 25, status: 'new' },
-            { id: 5, title: 'Language Translation API', difficulty: 'Intermediate', xp: 600, duration: '3h', tech: ['MarianMT', 'FastAPI', 'Python'], completion: 40, status: 'popular' },
-            { id: 6, title: 'Fine-Tune LLM with LoRA', difficulty: 'Expert', xp: 1300, duration: '6h', tech: ['LoRA', 'LLaMA', 'PEFT'], completion: 10, status: 'new' },
-        ]
-    },
-    {
-        id: 'computervision',
-        name: 'Computer Vision',
-        icon: 'fa-eye',
-        gradient: 'linear-gradient(135deg, #0d9488, #14b8a6)',
-        color: '#0d9488',
-        description: 'Teach machines to see, detect & recognize visually',
-        stats: { labs: 20, projects: 8, users: '4.8k' },
-        labs: [
-            { id: 1, title: 'Image Filters with OpenCV', difficulty: 'Beginner', xp: 250, duration: '1.5h', tech: ['OpenCV', 'Python', 'NumPy'], completion: 82, status: 'popular' },
-            { id: 2, title: 'Face Detection System', difficulty: 'Intermediate', xp: 500, duration: '2.5h', tech: ['Haar', 'dlib', 'OpenCV'], completion: 60, status: 'hot' },
-            { id: 3, title: 'Image Segmentation with SAM', difficulty: 'Advanced', xp: 900, duration: '4h', tech: ['SAM', 'PyTorch', 'COCO'], completion: 20, status: 'featured' },
-            { id: 4, title: 'OCR Document Scanner', difficulty: 'Intermediate', xp: 550, duration: '2.5h', tech: ['Tesseract', 'OpenCV', 'Python'], completion: 55, status: 'popular' },
-            { id: 5, title: 'Pose Estimation Pipeline', difficulty: 'Advanced', xp: 850, duration: '3.5h', tech: ['MediaPipe', 'OpenPose', 'Python'], completion: 25, status: 'new' },
-            { id: 6, title: 'Generative Art with GANs', difficulty: 'Expert', xp: 1200, duration: '5h', tech: ['StyleGAN', 'PyTorch', 'CUDA'], completion: 12, status: 'new' },
-        ]
-    },
-    {
-        id: 'quantum',
-        name: 'Quantum Computing',
-        icon: 'fa-atom',
-        gradient: 'linear-gradient(135deg, #7e22ce, #a855f7)',
-        color: '#7e22ce',
-        description: 'Explore quantum circuits, qubits & algorithms',
-        stats: { labs: 12, projects: 5, users: '2.1k' },
-        labs: [
-            { id: 1, title: 'Qiskit Hello World', difficulty: 'Beginner', xp: 300, duration: '2h', tech: ['Qiskit', 'Python', 'Qubit'], completion: 65, status: 'popular' },
-            { id: 2, title: 'Quantum Entanglement Lab', difficulty: 'Intermediate', xp: 600, duration: '3h', tech: ['Qiskit', 'Bell State', 'Python'], completion: 35, status: 'hot' },
-            { id: 3, title: 'Grover Search Algorithm', difficulty: 'Advanced', xp: 900, duration: '4h', tech: ['Qiskit', 'Oracle', 'Amplitude'], completion: 18, status: 'featured' },
-            { id: 4, title: 'Quantum Key Distribution', difficulty: 'Advanced', xp: 850, duration: '3.5h', tech: ['BB84', 'Qiskit', 'Crypto'], completion: 15, status: 'new' },
-            { id: 5, title: 'Shor Factoring Algorithm', difficulty: 'Expert', xp: 1400, duration: '6h', tech: ['Qiskit', 'Number Theory', 'QPE'], completion: 8, status: 'new' },
-            { id: 6, title: 'Variational Quantum Eigensolver', difficulty: 'Expert', xp: 1500, duration: '7h', tech: ['VQE', 'Qiskit', 'Chemistry'], completion: 5, status: 'hot' },
-        ]
-    },
-    {
-        id: 'networking',
-        name: 'Networking & Protocols',
-        icon: 'fa-network-wired',
-        gradient: 'linear-gradient(135deg, #0369a1, #0284c7)',
-        color: '#0369a1',
-        description: 'Understand TCP/IP, DNS, HTTP & network architecture',
-        stats: { labs: 18, projects: 7, users: '4.5k' },
-        labs: [
-            { id: 1, title: 'TCP/IP Fundamentals', difficulty: 'Beginner', xp: 200, duration: '1.5h', tech: ['TCP', 'IP', 'Wireshark'], completion: 82, status: 'popular' },
-            { id: 2, title: 'Build a DNS Server', difficulty: 'Advanced', xp: 800, duration: '3.5h', tech: ['DNS', 'Python', 'UDP'], completion: 25, status: 'featured' },
-            { id: 3, title: 'HTTP/2 & gRPC Comparison', difficulty: 'Intermediate', xp: 500, duration: '2.5h', tech: ['HTTP/2', 'gRPC', 'Protobuf'], completion: 45, status: 'hot' },
-            { id: 4, title: 'VPN Tunnel with WireGuard', difficulty: 'Intermediate', xp: 550, duration: '2h', tech: ['WireGuard', 'Linux', 'Crypto'], completion: 40, status: 'popular' },
-            { id: 5, title: 'Socket Programming in C', difficulty: 'Advanced', xp: 750, duration: '3h', tech: ['C', 'BSD Sockets', 'Linux'], completion: 22, status: 'new' },
-            { id: 6, title: 'Build an HTTP Server', difficulty: 'Intermediate', xp: 600, duration: '3h', tech: ['Python', 'HTTP', 'Threading'], completion: 50, status: 'new' },
-        ]
-    },
-    {
-        id: 'linux',
-        name: 'Linux & OS Administration',
-        icon: 'fa-terminal',
-        gradient: 'linear-gradient(135deg, #374151, #6b7280)',
-        color: '#374151',
-        description: 'Master the command line, shell scripting & sysadmin',
-        stats: { labs: 22, projects: 10, users: '8.2k' },
-        labs: [
-            { id: 1, title: 'Linux CLI Essentials', difficulty: 'Beginner', xp: 200, duration: '1h', tech: ['Bash', 'Linux', 'CLI'], completion: 92, status: 'popular' },
-            { id: 2, title: 'Shell Scripting Automation', difficulty: 'Intermediate', xp: 450, duration: '2.5h', tech: ['Bash', 'Cron', 'AWK'], completion: 60, status: 'hot' },
-            { id: 3, title: 'User & Permission Management', difficulty: 'Beginner', xp: 250, duration: '1.5h', tech: ['chmod', 'chown', 'ACL'], completion: 78, status: 'popular' },
-            { id: 4, title: 'Systemd & Service Management', difficulty: 'Intermediate', xp: 500, duration: '2h', tech: ['systemd', 'journalctl', 'Linux'], completion: 48, status: 'featured' },
-            { id: 5, title: 'Kernel Module Development', difficulty: 'Expert', xp: 1200, duration: '6h', tech: ['C', 'Kernel', 'Makefile'], completion: 10, status: 'new' },
-            { id: 6, title: 'LVM & Disk Partitioning', difficulty: 'Advanced', xp: 700, duration: '3h', tech: ['LVM', 'fdisk', 'RAID'], completion: 25, status: 'new' },
-        ]
+        labs: []
     }
 ];
 
-// ─── Difficulty Badge ───
+// ─── Internal Sub-Components ───
 const DifficultyBadge = ({ level }) => {
     const colors = {
-        'Beginner': { bg: '#dcfce7', text: '#16a34a' },
-        'Intermediate': { bg: '#dbeafe', text: '#2563eb' },
-        'Advanced': { bg: '#fef3c7', text: '#d97706' },
-        'Expert': { bg: '#fce7f3', text: '#db2777' }
+        'Beginner': '#10b981',
+        'Intermediate': '#3b82f6',
+        'Advanced': '#f59e0b',
+        'Expert': '#ef4444'
     };
-    const c = colors[level] || colors['Beginner'];
     return (
-        <span style={{ background: c.bg, color: c.text, padding: '4px 10px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 700 }}>
-            {level}
-        </span>
+        <span style={{
+            background: `${colors[level]}15`,
+            color: colors[level],
+            padding: '4px 10px',
+            borderRadius: '20px',
+            fontSize: '0.7rem',
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            border: `1px solid ${colors[level]}30`
+        }}>{level}</span>
     );
 };
 
-// ─── Status Tag ───
 const StatusTag = ({ status }) => {
     const map = {
         'popular': { icon: 'fa-fire', label: 'Popular', color: '#f97316' },
@@ -369,363 +105,214 @@ const StatusTag = ({ status }) => {
         'hot': { icon: 'fa-bolt', label: 'Hot', color: '#ef4444' },
         'featured': { icon: 'fa-award', label: 'Featured', color: '#3b82f6' }
     };
-    const s = map[status] || map['new'];
+    const s = map[status?.toLowerCase()] || map['new'];
     return (
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: s.color, fontSize: '0.7rem', fontWeight: 700 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: s.color, fontSize: '0.65rem', fontWeight: 800 }}>
             <i className={`fa-solid ${s.icon}`}></i> {s.label}
         </span>
     );
 };
 
-// ─── Lab Card ───
 const LabCard = ({ lab, domainColor }) => {
     const [hovered, setHovered] = useState(false);
+    const navigate = useNavigate();
 
     return (
         <motion.div
             whileHover={{ y: -4, boxShadow: `0 12px 30px ${domainColor}22` }}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
+            onClick={() => navigate(`/labs/${lab.id}`)}
             style={{
-                background: 'white',
-                borderRadius: '16px',
-                padding: '1.5rem',
+                background: 'white', borderRadius: '16px', padding: '1.25rem',
                 border: `1px solid ${hovered ? domainColor + '44' : '#f1f5f9'}`,
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                position: 'relative',
-                overflow: 'hidden'
+                cursor: 'pointer', transition: 'all 0.3s ease', position: 'relative', overflow: 'hidden'
             }}
         >
-            {/* Top glow */}
-            <div style={{
-                position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
-                background: domainColor, opacity: hovered ? 1 : 0, transition: 'opacity 0.3s'
-            }} />
-
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: domainColor, opacity: hovered ? 1 : 0, transition: 'opacity 0.3s' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                <StatusTag status={lab.status} />
+                <StatusTag status={lab.status || 'new'} />
                 <DifficultyBadge level={lab.difficulty} />
             </div>
-
-            <h4 style={{ fontSize: '1rem', fontWeight: 800, marginBottom: '0.5rem', color: '#1e293b', lineHeight: 1.3 }}>
-                {lab.title}
-            </h4>
-
-            {/* Tech Tags */}
+            <h4 style={{ fontSize: '0.95rem', fontWeight: 800, marginBottom: '0.5rem', color: '#0f172a', lineHeight: 1.3 }}>{lab.title}</h4>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '1rem' }}>
-                {lab.tech.map((t, i) => (
-                    <span key={i} style={{
-                        background: '#f8fafc', border: '1px solid #e2e8f0', padding: '2px 8px',
-                        borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600, color: '#64748b'
-                    }}>{t}</span>
+                {(lab.tech || ['Coding']).map((t, i) => (
+                    <span key={i} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', padding: '2px 8px', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 600, color: '#64748b' }}>{t}</span>
                 ))}
             </div>
-
-            {/* Progress */}
-            <div style={{ marginBottom: '0.75rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8', marginBottom: '4px' }}>
-                    <span>{lab.completion}% avg completion</span>
-                    <span>{lab.duration}</span>
-                </div>
-                <div style={{ height: '4px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${lab.completion}%` }}
-                        transition={{ duration: 1, delay: 0.2 }}
-                        style={{ height: '100%', background: domainColor, borderRadius: '4px' }}
-                    />
-                </div>
-            </div>
-
-            {/* Footer */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <i className="fa-solid fa-bolt" style={{ color: '#f59e0b', fontSize: '0.8rem' }}></i>
-                    <span style={{ fontWeight: 800, fontSize: '0.85rem', color: domainColor }}>{lab.xp} XP</span>
+                    <span style={{ fontWeight: 800, fontSize: '0.8rem', color: domainColor }}>{lab.xpReward || lab.xp || 100} XP</span>
                 </div>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{
-                        background: domainColor, color: 'white', border: 'none', padding: '8px 18px',
-                        borderRadius: '10px', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', gap: '6px'
-                    }}
+                <button 
+                    style={{ background: domainColor, color: 'white', border: 'none', padding: '6px 14px', borderRadius: '8px', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer' }}
                 >
-                    <i className="fa-solid fa-play" style={{ fontSize: '0.65rem' }}></i> Start Lab
-                </motion.button>
+                    Start
+                </button>
             </div>
         </motion.div>
     );
 };
 
-// ─── Domain Section ───
-const DomainSection = ({ domain, isExpanded, onToggle }) => {
-    return (
-        <motion.div
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{ marginBottom: '2rem' }}
-        >
-            {/* Domain Header */}
-            <motion.div
-                whileHover={{ scale: 1.005 }}
-                onClick={onToggle}
-                style={{
-                    background: domain.gradient,
-                    borderRadius: isExpanded ? '20px 20px 0 0' : '20px',
-                    padding: '1.5rem 2rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    boxShadow: `0 8px 25px ${domain.color}33`,
-                    transition: 'border-radius 0.3s'
-                }}
-            >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{
-                        width: '52px', height: '52px', borderRadius: '14px',
-                        background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', color: 'white'
-                    }}>
-                        <i className={`fa-solid ${domain.icon}`}></i>
-                    </div>
-                    <div>
-                        <h3 style={{ color: 'white', fontSize: '1.3rem', fontWeight: 900, marginBottom: '2px' }}>
-                            {domain.name}
-                        </h3>
-                        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem', fontWeight: 500 }}>
-                            {domain.description}
-                        </p>
-                    </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                    {/* Stats */}
-                    <div style={{ display: 'flex', gap: '1.5rem' }}>
-                        {[
-                            { label: 'Labs', value: domain.stats.labs },
-                            { label: 'Projects', value: domain.stats.projects },
-                            { label: 'Learners', value: domain.stats.users },
-                        ].map((s, i) => (
-                            <div key={i} style={{ textAlign: 'center' }}>
-                                <div style={{ color: 'white', fontWeight: 900, fontSize: '1.1rem' }}>{s.value}</div>
-                                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.7rem', fontWeight: 600 }}>{s.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                    <motion.div
-                        animate={{ rotate: isExpanded ? 180 : 0 }}
-                        style={{ color: 'white', fontSize: '1.2rem' }}
-                    >
-                        <i className="fa-solid fa-chevron-down"></i>
-                    </motion.div>
-                </div>
-            </motion.div>
-
-            {/* Expanded Labs Grid */}
-            <AnimatePresence>
-                {isExpanded && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        style={{
-                            overflow: 'hidden',
-                            background: '#fafbfe',
-                            borderRadius: '0 0 20px 20px',
-                            border: `1px solid ${domain.color}22`,
-                            borderTop: 'none'
-                        }}
-                    >
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                            gap: '1.25rem',
-                            padding: '1.5rem'
-                        }}>
-                            {domain.labs.map((lab) => (
-                                <LabCard key={lab.id} lab={lab} domainColor={domain.color} />
-                            ))}
-                        </div>
-
-                        {/* View All button */}
-                        <div style={{ textAlign: 'center', paddingBottom: '1.5rem' }}>
-                            <motion.button
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                                style={{
-                                    background: 'transparent', border: `2px solid ${domain.color}`,
-                                    color: domain.color, padding: '10px 28px', borderRadius: '12px',
-                                    fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer',
-                                    display: 'inline-flex', alignItems: 'center', gap: '8px'
-                                }}
-                            >
-                                View All {domain.stats.labs} Labs <i className="fa-solid fa-arrow-right"></i>
-                            </motion.button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
-    );
-};
-
-// ─── Main Page ───
-const PracticalHub = () => {
-    const [expandedDomains, setExpandedDomains] = useState(['webdev']);
+// ─── Main Hub Component ───
+const PracticalHub = ({ embedded = false }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('All');
+    const [expandedDomains, setExpandedDomains] = useState([]);
+    const [domainLabs, setDomainLabs] = useState({});
+    const [fetchingLabs, setFetchingLabs] = useState(false);
 
-    const toggleDomain = (id) => {
-        setExpandedDomains(prev =>
-            prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]
-        );
+    const toggleDomain = async (domain) => {
+        const id = domain.id;
+        const name = domain.name;
+
+        if (expandedDomains.includes(id)) {
+            setExpandedDomains(prev => prev.filter(d => d !== id));
+            return;
+        }
+
+        setExpandedDomains(prev => [...prev, id]);
+
+        if (!domainLabs[name]) {
+            try {
+                setFetchingLabs(true);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/labs?domain=${name}`);
+                const data = await res.json();
+                if (data.success) {
+                    setDomainLabs(prev => ({ ...prev, [name]: data.data }));
+                }
+            } catch (err) {
+                console.error("Failed to fetch labs", err);
+            } finally {
+                setFetchingLabs(false);
+            }
+        }
     };
 
-    const filteredDomains = domains.map(d => ({
-        ...d,
-        labs: d.labs.filter(l => {
-            const matchesSearch = searchQuery === '' ||
-                l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                l.tech.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
-            const matchesDifficulty = selectedDifficulty === 'All' || l.difficulty === selectedDifficulty;
-            return matchesSearch && matchesDifficulty;
-        })
-    })).filter(d => d.labs.length > 0 || searchQuery === '');
+    const filteredDomains = PRACTICAL_DOMAINS.filter(domain => 
+        domain.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        domain.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-    const totalLabs = domains.reduce((sum, d) => sum + d.stats.labs, 0);
-    const totalProjects = domains.reduce((sum, d) => sum + d.stats.projects, 0);
-
-    return (
-        <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
-
-            {/* ─── Hero Header ─── */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{
-                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
-                    borderRadius: '24px',
-                    padding: '2.5rem 3rem',
-                    marginBottom: '2rem',
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}
-            >
-                {/* Decorative elements */}
-                <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.15), transparent)', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', bottom: '-30px', left: '30%', width: '150px', height: '150px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1), transparent)', pointerEvents: 'none' }} />
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-                    <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.75rem' }}>
-                            <span style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '0.8rem', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase' }}>
-                                Hands-On Practice
-                            </span>
-                            <span style={{ background: '#ef4444', color: 'white', padding: '2px 8px', borderRadius: '6px', fontSize: '0.65rem', fontWeight: 800 }}>LIVE</span>
-                        </div>
-                        <h1 style={{ color: 'white', fontSize: '2.2rem', fontWeight: 900, marginBottom: '0.5rem' }}>
-                            <i className="fa-solid fa-flask-vial" style={{ marginRight: '12px', color: '#3b82f6' }}></i>
-                            Practical Hub
-                        </h1>
-                        <p style={{ color: '#94a3b8', fontSize: '1.05rem', maxWidth: '550px', lineHeight: 1.6 }}>
-                            Master real-world skills with hands-on labs, projects, and challenges across <b style={{ color: '#e2e8f0' }}>{domains.length} domains</b>.
-                        </p>
-                    </div>
-
-                    {/* Quick Stats */}
-                    <div style={{ display: 'flex', gap: '1.5rem' }}>
-                        {[
-                            { icon: 'fa-flask', value: totalLabs, label: 'Labs', color: '#3b82f6' },
-                            { icon: 'fa-diagram-project', value: totalProjects, label: 'Projects', color: '#10b981' },
-                            { icon: 'fa-layer-group', value: domains.length, label: 'Domains', color: '#8b5cf6' },
-                        ].map((stat, i) => (
-                            <motion.div
-                                key={i}
-                                whileHover={{ y: -3 }}
-                                style={{
-                                    background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(10px)',
-                                    border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px',
-                                    padding: '1.25rem 1.5rem', textAlign: 'center', minWidth: '100px'
-                                }}
-                            >
-                                <i className={`fa-solid ${stat.icon}`} style={{ color: stat.color, fontSize: '1.2rem', marginBottom: '8px', display: 'block' }}></i>
-                                <div style={{ color: 'white', fontWeight: 900, fontSize: '1.4rem' }}>{stat.value}</div>
-                                <div style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 600 }}>{stat.label}</div>
-                            </motion.div>
-                        ))}
-                    </div>
+    const content = (
+        <div style={{ padding: embedded ? '0' : '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+            {!embedded && (
+                <div style={{ marginBottom: '3rem' }}>
+                    <h1 style={{ fontSize: '2.5rem', fontWeight: 900, color: '#0f172a', marginBottom: '0.5rem' }}>
+                        <i className="fa-solid fa-flask-vial" style={{ color: '#3b82f6', marginRight: '15px' }}></i>
+                        PRACTICAL SOLUTIONS HUB
+                    </h1>
+                    <p style={{ color: '#64748b', fontSize: '1.1rem', fontWeight: 500 }}>
+                        Master 20+ domains with hands-on labs and real-world technical challenges.
+                    </p>
                 </div>
+            )}
 
-                {/* Search & Filters */}
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', position: 'relative', zIndex: 1 }}>
-                    <div style={{ flex: 1, position: 'relative' }}>
-                        <i className="fa-solid fa-search" style={{ position: 'absolute', left: '16px', top: '14px', color: '#64748b' }}></i>
+            <div style={{ background: '#f8fafc', borderRadius: '30px', padding: '2rem', border: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                    <div style={{ position: 'relative', flex: 1, maxWidth: '500px' }}>
+                        <i className="fa-solid fa-search" style={{ position: 'absolute', left: '15px', top: '15px', color: '#94a3b8' }}></i>
                         <input
                             type="text"
-                            placeholder="Search labs by name, technology, or skill..."
+                            placeholder="Search by technology (React, AI, Cloud...)"
                             value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             style={{
-                                width: '100%', padding: '12px 16px 12px 44px', borderRadius: '14px',
-                                border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.07)',
-                                color: 'white', fontSize: '0.95rem', outline: 'none',
-                                backdropFilter: 'blur(10px)'
+                                width: '100%', padding: '12px 15px 12px 45px', borderRadius: '14px',
+                                border: '1px solid #e2e8f0', background: 'white', color: '#1e293b',
+                                fontSize: '0.95rem', fontWeight: 600, outline: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.02)'
                             }}
                         />
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                        {['All', 'Beginner', 'Intermediate', 'Advanced', 'Expert'].map(d => (
-                            <motion.button
-                                key={d}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setSelectedDifficulty(d)}
+                        {['All', 'Beginner', 'Intermediate', 'Advanced'].map(diff => (
+                            <button
+                                key={diff}
+                                onClick={() => setSelectedDifficulty(diff)}
                                 style={{
-                                    background: selectedDifficulty === d ? '#3b82f6' : 'rgba(255,255,255,0.07)',
-                                    color: selectedDifficulty === d ? 'white' : '#94a3b8',
-                                    border: '1px solid ' + (selectedDifficulty === d ? '#3b82f6' : 'rgba(255,255,255,0.1)'),
-                                    padding: '10px 18px', borderRadius: '12px',
-                                    fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer',
-                                    whiteSpace: 'nowrap'
+                                    padding: '8px 16px', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 700,
+                                    cursor: 'pointer', border: 'none', transition: 'all 0.2s',
+                                    background: selectedDifficulty === diff ? '#0f172a' : 'white',
+                                    color: selectedDifficulty === diff ? 'white' : '#64748b',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                                 }}
-                            >
-                                {d}
-                            </motion.button>
+                            >{diff}</button>
                         ))}
                     </div>
                 </div>
-            </motion.div>
 
-            {/* ─── Domain Sections ─── */}
-            {filteredDomains.map((domain) => (
-                <DomainSection
-                    key={domain.id}
-                    domain={domain}
-                    isExpanded={expandedDomains.includes(domain.id)}
-                    onToggle={() => toggleDomain(domain.id)}
-                />
-            ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {filteredDomains.map((domain) => {
+                        const isExpanded = expandedDomains.includes(domain.id);
+                        return (
+                            <div key={domain.id} style={{ borderRadius: '20px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                                <motion.div
+                                    whileHover={{ scale: 1.005, boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}
+                                    onClick={() => toggleDomain(domain)}
+                                    style={{
+                                        background: domain.gradient, padding: '1.25rem 2rem', cursor: 'pointer',
+                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.3s'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                                        <div style={{ width: '45px', height: '45px', borderRadius: '12px', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.2rem' }}>
+                                            <i className={`fa-solid ${domain.icon}`}></i>
+                                        </div>
+                                        <div>
+                                            <h3 style={{ color: 'white', fontSize: '1.1rem', fontWeight: 900, margin: 0 }}>{domain.name}</h3>
+                                            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem', fontWeight: 600, margin: 0 }}>{domain.description}</p>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                                        <div style={{ display: 'flex', gap: '1.5rem' }}>
+                                            <div style={{ textAlign: 'center' }}>
+                                                <div style={{ color: 'white', fontWeight: 900, fontSize: '1rem' }}>{domain.stats.labs}</div>
+                                                <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.65rem', fontWeight: 700 }}>LABS</div>
+                                            </div>
+                                            <div style={{ textAlign: 'center' }}>
+                                                <div style={{ color: 'white', fontWeight: 900, fontSize: '1rem' }}>{domain.stats.users}</div>
+                                                <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.65rem', fontWeight: 700 }}>USERS</div>
+                                            </div>
+                                        </div>
+                                        <motion.i animate={{ rotate: isExpanded ? 180 : 0 }} className="fa-solid fa-chevron-down" style={{ color: 'white' }}></motion.i>
+                                    </div>
+                                </motion.div>
 
-            {filteredDomains.length === 0 && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    style={{
-                        textAlign: 'center', padding: '4rem', color: '#94a3b8'
-                    }}
-                >
-                    <i className="fa-solid fa-magnifying-glass" style={{ fontSize: '3rem', marginBottom: '1rem', display: 'block' }}></i>
-                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.5rem' }}>No labs found</h3>
-                    <p>Try adjusting your search or filters</p>
-                </motion.div>
-            )}
+                                <AnimatePresence>
+                                    {isExpanded && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            style={{ background: 'white' }}
+                                        >
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem', padding: '1.5rem' }}>
+                                                {fetchingLabs && !domainLabs[domain.name] ? (
+                                                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem' }}>
+                                                        <i className="fa-solid fa-circle-notch fa-spin" style={{ fontSize: '2rem', color: domain.color }}></i>
+                                                    </div>
+                                                ) : (
+                                                    (domainLabs[domain.name] || []).filter(l => selectedDifficulty === 'All' || l.difficulty === selectedDifficulty).map(lab => (
+                                                        <LabCard key={lab.id} lab={lab} domainColor={domain.color} />
+                                                    ))
+                                                )}
+                                                {(domainLabs[domain.name]?.length === 0) && (
+                                                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '2rem', color: '#94a3b8' }}>No labs available in this domain yet.</div>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
         </div>
     );
+
+    return content;
 };
 
 export default PracticalHub;

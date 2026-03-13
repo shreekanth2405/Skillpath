@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+
+// ─── Recharts Imports ───
 import {
     LineChart, Line, AreaChart, Area, BarChart, Bar,
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell
 } from 'recharts';
-
 const Dashboard = ({ setActiveTab, userXP, userLevel, userCoins, user }) => {
     // --- MOCK DATA ---
     const activePath = JSON.parse(localStorage.getItem('activeLearningPath'));
+
+    const [activeTabLocal, setActiveTabLocal] = useState('overview');
 
     const learningProgress = [
         { day: 'Mon', xp: 120 }, { day: 'Tue', xp: 210 }, { day: 'Wed', xp: 180 },
@@ -171,118 +175,7 @@ const Dashboard = ({ setActiveTab, userXP, userLevel, userCoins, user }) => {
 
                     </motion.div>
 
-                    {/* ═══════════ SOLUTIONS — UNIFIED SECTION ═══════════ */}
-                    <motion.div variants={itemVariants} style={{ gridColumn: 'span 12', borderRadius: '24px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.08)' }}>
 
-                        {/* Solutions Header */}
-                        <div style={{
-                            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%)',
-                            padding: '2rem 2.5rem',
-                            position: 'relative',
-                            overflow: 'hidden'
-                        }}>
-                            <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.15), transparent)', pointerEvents: 'none' }}></div>
-                            <div style={{ position: 'absolute', bottom: '-30px', left: '40%', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.1), transparent)', pointerEvents: 'none' }}></div>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                    <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: 'white' }}>
-                                        <i className="fa-solid fa-flask-vial"></i>
-                                    </div>
-                                    <div>
-                                        <h2 style={{ color: 'white', fontSize: '1.6rem', fontWeight: 900, margin: '0 0 4px 0' }}>
-                                            <i className="fa-solid fa-sparkles" style={{ color: '#f59e0b', marginRight: '8px' }}></i>
-                                            Solutions — Domain Practical Hub
-                                        </h2>
-                                        <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: 0 }}>
-                                            Master any domain with 500+ hands-on labs, real projects, and guided challenges across 20 domains
-                                        </p>
-                                    </div>
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        {[
-                                            { val: '500+', label: 'Labs' },
-                                            { val: '20', label: 'Domains' },
-                                            { val: '76k+', label: 'XP' },
-                                        ].map((s, i) => (
-                                            <div key={i} style={{ textAlign: 'center', background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '8px 14px' }}>
-                                                <div style={{ color: 'white', fontWeight: 900, fontSize: '1rem' }}>{s.val}</div>
-                                                <div style={{ color: '#64748b', fontSize: '0.6rem', fontWeight: 700 }}>{s.label}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <button onClick={() => setActiveTab('practical')} style={{ background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: 'white', border: 'none', padding: '12px 22px', borderRadius: '14px', fontWeight: 800, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        Explore All <i className="fa-solid fa-arrow-right"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Domain Cards Grid — Inside the same section */}
-                        <div style={{ background: '#f8fafc', padding: '1.5rem 2rem 2rem' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '1rem' }}>
-                                {[
-                                    { name: 'Web Development', icon: 'fa-globe', gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)', labs: 42, xp: '3.6k', desc: 'React, Next.js, APIs' },
-                                    { name: 'AI & Machine Learning', icon: 'fa-brain', gradient: 'linear-gradient(135deg, #8b5cf6, #d946ef)', labs: 35, xp: '4.5k', desc: 'TensorFlow, LangChain' },
-                                    { name: 'Data Science', icon: 'fa-chart-line', gradient: 'linear-gradient(135deg, #10b981, #14b8a6)', labs: 38, xp: '3.1k', desc: 'Pandas, PySpark' },
-                                    { name: 'Cybersecurity', icon: 'fa-shield-halved', gradient: 'linear-gradient(135deg, #ef4444, #f97316)', labs: 30, xp: '4.2k', desc: 'CTF, Ethical Hacking' },
-                                    { name: 'Cloud & DevOps', icon: 'fa-cloud', gradient: 'linear-gradient(135deg, #f59e0b, #eab308)', labs: 28, xp: '3.6k', desc: 'Docker, K8s, Terraform' },
-                                    { name: 'Mobile Dev', icon: 'fa-mobile-screen-button', gradient: 'linear-gradient(135deg, #06b6d4, #0ea5e9)', labs: 25, xp: '3.2k', desc: 'React Native, Flutter' },
-                                    { name: 'Blockchain & Web3', icon: 'fa-link', gradient: 'linear-gradient(135deg, #6366f1, #a855f7)', labs: 20, xp: '4.8k', desc: 'Solidity, NFTs, DeFi' },
-                                    { name: 'Game Dev', icon: 'fa-gamepad', gradient: 'linear-gradient(135deg, #ec4899, #f43f5e)', labs: 22, xp: '3.5k', desc: 'Unity, Phaser.js' },
-                                    { name: 'DSA & CP', icon: 'fa-code', gradient: 'linear-gradient(135deg, #0891b2, #06b6d4)', labs: 50, xp: '4.1k', desc: 'DP, Graphs, Contests' },
-                                    { name: 'Database & SQL', icon: 'fa-database', gradient: 'linear-gradient(135deg, #059669, #10b981)', labs: 32, xp: '3.3k', desc: 'PostgreSQL, MongoDB' },
-                                    { name: 'UI/UX Design', icon: 'fa-palette', gradient: 'linear-gradient(135deg, #e11d48, #f43f5e)', labs: 26, xp: '2.8k', desc: 'Figma, Design Systems' },
-                                    { name: 'Testing & QA', icon: 'fa-vial-circle-check', gradient: 'linear-gradient(135deg, #16a34a, #22c55e)', labs: 24, xp: '3.0k', desc: 'Jest, Cypress, Selenium' },
-                                    { name: 'System Design', icon: 'fa-sitemap', gradient: 'linear-gradient(135deg, #7c3aed, #6d28d9)', labs: 20, xp: '4.7k', desc: 'Microservices, CDN' },
-                                    { name: 'IoT & Embedded', icon: 'fa-microchip', gradient: 'linear-gradient(135deg, #ca8a04, #eab308)', labs: 18, xp: '3.3k', desc: 'Arduino, MQTT, TinyML' },
-                                    { name: 'AR / VR / XR', icon: 'fa-vr-cardboard', gradient: 'linear-gradient(135deg, #be185d, #ec4899)', labs: 15, xp: '3.6k', desc: 'Three.js, WebXR, Unity' },
-                                    { name: 'NLP', icon: 'fa-language', gradient: 'linear-gradient(135deg, #4f46e5, #818cf8)', labs: 22, xp: '3.8k', desc: 'spaCy, BERT, LoRA' },
-                                    { name: 'Computer Vision', icon: 'fa-eye', gradient: 'linear-gradient(135deg, #0d9488, #14b8a6)', labs: 20, xp: '3.7k', desc: 'OpenCV, SAM, GANs' },
-                                    { name: 'Quantum Computing', icon: 'fa-atom', gradient: 'linear-gradient(135deg, #7e22ce, #a855f7)', labs: 12, xp: '5.0k', desc: 'Qiskit, Grover, Shor' },
-                                    { name: 'Networking', icon: 'fa-network-wired', gradient: 'linear-gradient(135deg, #0369a1, #0284c7)', labs: 18, xp: '3.1k', desc: 'TCP/IP, gRPC, DNS' },
-                                    { name: 'Linux & OS', icon: 'fa-terminal', gradient: 'linear-gradient(135deg, #374151, #6b7280)', labs: 22, xp: '3.3k', desc: 'Bash, systemd, Kernel' },
-                                ].map((domain, i) => (
-                                    <motion.div
-                                        key={i}
-                                        whileHover={{ y: -5, boxShadow: '0 16px 35px rgba(0,0,0,0.1)' }}
-                                        onClick={() => setActiveTab('practical')}
-                                        style={{
-                                            background: '#ffffff',
-                                            borderRadius: '16px',
-                                            padding: '1.2rem',
-                                            cursor: 'pointer',
-                                            border: '1px solid #f1f5f9',
-                                            transition: 'all 0.3s ease',
-                                            position: 'relative',
-                                            overflow: 'hidden'
-                                        }}
-                                    >
-                                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: domain.gradient }} />
-                                        <div style={{
-                                            width: '44px', height: '44px', borderRadius: '12px',
-                                            background: domain.gradient, display: 'flex', alignItems: 'center',
-                                            justifyContent: 'center', fontSize: '1.1rem', color: 'white', marginBottom: '0.6rem',
-                                            boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                                        }}>
-                                            <i className={`fa-solid ${domain.icon}`}></i>
-                                        </div>
-                                        <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#1e293b', margin: '0 0 3px 0', lineHeight: 1.2 }}>{domain.name}</h4>
-                                        <p style={{ color: '#94a3b8', fontSize: '0.72rem', margin: '0 0 0.6rem 0', fontWeight: 500 }}>{domain.desc}</p>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.68rem', fontWeight: 700, color: '#64748b' }}>
-                                                <i className="fa-solid fa-flask" style={{ color: '#3b82f6' }}></i> {domain.labs} Labs
-                                            </span>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.68rem', fontWeight: 700, color: '#f59e0b' }}>
-                                                <i className="fa-solid fa-bolt"></i> {domain.xp} XP
-                                            </span>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </div>
-                    </motion.div>
 
                     {/* CHART: Market Demand */}
                     <motion.div variants={itemVariants} whileHover={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)' }}

@@ -57,8 +57,8 @@ import Contact from './pages/Contact';
 import BookReader from './pages/BookReader';
 import SolarSystem from './pages/SolarSystem';
 import UrbanWarzone from './pages/UrbanWarzone';
-// import Labs from './pages/Labs';
-// import LabRoom from './pages/LabRoom';
+import Labs from './pages/Labs';
+import LabRoom from './pages/LabRoom';
 
 function MainApp() {
   const navigate = useNavigate();
@@ -254,6 +254,7 @@ function MainApp() {
       <Route path="/communicationhub" element={<ProtectedLayout><CommunicationHub setActiveTab={setActiveTab} /></ProtectedLayout>} />
       <Route path="/learning" element={<ProtectedLayout><LearningHub setActiveTab={setActiveTab} /></ProtectedLayout>} />
       <Route path="/career" element={<ProtectedLayout><CareerHub setActiveTab={setActiveTab} /></ProtectedLayout>} />
+      <Route path="/practical" element={<ProtectedLayout><PracticalHub setActiveTab={setActiveTab} /></ProtectedLayout>} />
       <Route path="/resources" element={<ProtectedLayout><Resources /></ProtectedLayout>} />
       <Route path="/book-reader" element={<ProtectedLayout><BookReader /></ProtectedLayout>} />
       <Route path="/contact" element={<ProtectedLayout><Contact /></ProtectedLayout>} />
@@ -276,10 +277,8 @@ function MainApp() {
         knowledgeBaseRef={knowledgeBaseRef}
         handleQuerySubmit={handleQuerySubmit}
       /></ProtectedLayout>} />
-      {/*
       <Route path="/learning/labs" element={<ProtectedLayout><Labs setActiveTab={setActiveTab} /></ProtectedLayout>} />
       <Route path="/labs/:id" element={<ProtectedLayout><LabRoom /></ProtectedLayout>} />
-      */}
       <Route path="/learning/sessions" element={<ProtectedLayout><ELearningSession /></ProtectedLayout>} />
       <Route path="/learning/assessments" element={<ProtectedLayout><TestSystem /></ProtectedLayout>} />
       <Route path="/learning/reviews" element={<ProtectedLayout><CodeReviewer /></ProtectedLayout>} />
