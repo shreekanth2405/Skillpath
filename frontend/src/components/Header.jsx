@@ -108,9 +108,9 @@ const Header = ({
             { id: 'practical', label: 'Practical Hub', icon: 'fa-flask-vial', desc: '500+ hands-on labs' },
         ],
         'Job Search & Portals': [
-            { id: 'resources', label: 'Global Job Portals', icon: 'fa-globe', desc: 'LinkedIn, Naukri, & 20+ more' },
-            { id: 'resources', label: 'Tech Job Boards', icon: 'fa-code-branch', desc: 'Hired, Dice, StackOverflow' },
-            { id: 'resources', label: 'Remote Roles', icon: 'fa-laptop-house', desc: 'Remote.co, WeWorkRemotely' },
+            { id: 'resources?tab=career', label: 'Global Job Portals', icon: 'fa-globe', desc: 'LinkedIn, Naukri, & 20+ more' },
+            { id: 'resources?tab=career', label: 'Tech Job Boards', icon: 'fa-code-branch', desc: 'Hired, Dice, StackOverflow' },
+            { id: 'resources?tab=career', label: 'Remote Roles', icon: 'fa-laptop-house', desc: 'Remote.co, WeWorkRemotely' },
         ],
         'Communication & Growth': [
             { id: 'communicationhub', label: 'Communication Hub', icon: 'fa-comments', desc: 'Speaking & Language' },

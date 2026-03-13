@@ -8,6 +8,15 @@ const Resources = () => {
 
     // --- State Management ---
     const [activeTab, setActiveTab] = useState('library'); // 'library' | 'career'
+    
+    // Support deep-linking to tabs
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab');
+        if (tab === 'career') setActiveTab('career');
+        else if (tab === 'library') setActiveTab('library');
+    }, [window.location.search]);
+
     const [level, setLevel] = useState(1); // 1: Category, 2: SubCategory, 3: Subject/Books
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubCategory, setSelectedSubCategory] = useState(null);

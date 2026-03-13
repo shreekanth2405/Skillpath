@@ -13,6 +13,7 @@ const LabRoom = () => {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [activeTask, setActiveTask] = useState(0);
+    const [showSolution, setShowSolution] = useState(false);
 
     useEffect(() => {
         const fetchLab = async () => {
@@ -118,6 +119,45 @@ const LabRoom = () => {
                             </div>
                         ))}
                     </div>
+
+                    {lab.solution && (
+                        <div style={{ marginTop: '2rem' }}>
+                            <button 
+                                onClick={() => setShowSolution(!showSolution)}
+                                style={{
+                                    width: '100%', padding: '0.75rem', borderRadius: '12px',
+                                    background: showSolution ? '#ec489915' : 'rgba(255,255,255,0.05)',
+                                    color: showSolution ? '#ec4899' : '#94a3b8',
+                                    border: `1px solid ${showSolution ? '#ec489944' : '#334155'}`,
+                                    fontWeight: 800, cursor: 'pointer', transition: '0.3s',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
+                                }}
+                            >
+                                <i className={`fa-solid ${showSolution ? 'fa-eye-slash' : 'fa-lightbulb'}`}></i>
+                                {showSolution ? 'HIDE MODEL SOLUTION' : 'VIEW MODEL SOLUTION'}
+                            </button>
+                            
+                            <AnimatePresence>
+                                {showSolution && (
+                                    <motion.div 
+                                        initial={{ height: 0, opacity: 0 }} 
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        style={{ overflow: 'hidden' }}
+                                    >
+                                        <div style={{ 
+                                            background: '#0f172a', padding: '1rem', borderRadius: '12px', 
+                                            marginTop: '0.5rem', border: '1px solid #ec489933',
+                                            fontSize: '0.8rem', fontFamily: 'monospace', whiteSpace: 'pre-wrap',
+                                            color: '#e2e8f0'
+                                        }}>
+                                            {lab.solution}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    )}
                 </div>
 
                 <div style={{ marginTop: 'auto', padding: '2rem', background: '#0f172a' }}>
