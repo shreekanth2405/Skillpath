@@ -228,7 +228,10 @@ const Resources = () => {
                                                     </div>
                                                     <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>{book}</h4>
                                                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-                                                        <button onClick={() => navigate('/book-reader')} style={{ flex: 1, padding: '8px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>Read</button>
+                                                        <button onClick={() => navigate('/book-reader')} style={{ flex: 1, padding: '8px', background: '#e2e8f0', color: '#0f172a', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>Read</button>
+                                                        <a href={`https://archive.org/search.php?query=${encodeURIComponent(book)}+AND+mediatype:texts`} target="_blank" rel="noreferrer" style={{ flex: 1.5, textDecoration: 'none', textAlign: 'center', padding: '8px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                                                            <i className="fa-solid fa-download"></i> Archive
+                                                        </a>
                                                         <button onClick={(e) => toggleBookmark(e, book, selectedSubCategory.title)} style={{ width: '40px', background: bookmarkedGames[book] ? '#3b82f6' : '#f8fafc', color: bookmarkedGames[book] ? 'white' : '#64748b', border: '1px solid #e2e8f0', borderRadius: '8px', cursor: 'pointer' }}>
                                                             <i className={bookmarkedGames[book] ? "fa-solid fa-bookmark" : "fa-regular fa-bookmark"}></i>
                                                         </button>
