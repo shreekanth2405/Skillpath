@@ -106,7 +106,11 @@ const Header = ({
             { id: 'learning', label: 'Learning Hub', icon: 'fa-book-open', desc: '1000+ courses & tutorials' },
             { id: 'career', label: 'Career Hub', icon: 'fa-briefcase', desc: 'Resumes, trackers, roadmaps' },
             { id: 'practical', label: 'Practical Hub', icon: 'fa-flask-vial', desc: '500+ hands-on labs' },
-            { id: 'learning/paths', label: 'AI Skill Path Editor', icon: 'fa-road', desc: 'Generate custom curricula' },
+        ],
+        'Job Search & Portals': [
+            { id: 'resources', label: 'Global Job Portals', icon: 'fa-globe', desc: 'LinkedIn, Naukri, & 20+ more' },
+            { id: 'resources', label: 'Tech Job Boards', icon: 'fa-code-branch', desc: 'Hired, Dice, StackOverflow' },
+            { id: 'resources', label: 'Remote Roles', icon: 'fa-laptop-house', desc: 'Remote.co, WeWorkRemotely' },
         ],
         'Communication & Growth': [
             { id: 'communicationhub', label: 'Communication Hub', icon: 'fa-comments', desc: 'Speaking & Language' },

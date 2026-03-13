@@ -66,11 +66,32 @@ const Resources = () => {
     ];
 
     const jobPortals = [
-        { name: 'Naukri', icon: 'fa-solid fa-user-tie', color: '#4a90e2', url: 'https://www.naukri.com' },
-        { name: 'LinkedIn', icon: 'fa-brands fa-linkedin', color: '#0077b5', url: 'https://www.linkedin.com/jobs' },
-        { name: 'Indeed', icon: 'fa-solid fa-briefcase', color: '#2557a7', url: 'https://www.indeed.com' },
-        { name: 'Monster', icon: 'fa-solid fa-ghost', color: '#6d4c41', url: 'https://www.monster.com' },
-        { name: 'Glassdoor', icon: 'fa-solid fa-building', color: '#08a05c', url: 'https://www.glassdoor.com' }
+        // Top Tiers
+        { name: 'Naukri', icon: 'fa-solid fa-user-tie', color: '#4a90e2', url: 'https://www.naukri.com', category: 'Premium' },
+        { name: 'LinkedIn', icon: 'fa-brands fa-linkedin', color: '#0077b5', url: 'https://www.linkedin.com/jobs', category: 'Premium' },
+        { name: 'Indeed', icon: 'fa-solid fa-briefcase', color: '#2557a7', url: 'https://www.indeed.com', category: 'Premium' },
+        { name: 'Glassdoor', icon: 'fa-solid fa-building', color: '#08a05c', url: 'https://www.glassdoor.com', category: 'Premium' },
+
+        // Tech & Specialized
+        { name: 'Hired', icon: 'fa-solid fa-code-merge', color: '#6366f1', url: 'https://hired.com', category: 'Tech' },
+        { name: 'Wellfound (AngelList)', icon: 'fa-brands fa-angellist', color: '#ff4f4f', url: 'https://wellfound.com/jobs', category: 'Tech' },
+        { name: 'Dice', icon: 'fa-solid fa-dice-d20', color: '#cc0000', url: 'https://www.dice.com', category: 'Tech' },
+        { name: 'Stack Overflow', icon: 'fa-brands fa-stack-overflow', color: '#f48024', url: 'https://stackoverflow.com/jobs', category: 'Tech' },
+
+        // Remote & Global
+        { name: 'Remote.co', icon: 'fa-solid fa-globe', color: '#37a7e8', url: 'https://remote.co/remote-jobs', category: 'Remote' },
+        { name: 'We Work Remotely', icon: 'fa-solid fa-laptop-house', color: '#eb4b23', url: 'https://weworkremotely.com', category: 'Remote' },
+        { name: 'FlexJobs', icon: 'fa-solid fa-calendar-check', color: '#165c7d', url: 'https://www.flexjobs.com', category: 'Remote' },
+        { name: 'Workana', icon: 'fa-solid fa-globe-americas', color: '#314555', url: 'https://www.workana.com', category: 'Remote' },
+
+        // General Indian Portals
+        { name: 'Apna', icon: 'fa-solid fa-mobile-screen-button', color: '#25D366', url: 'https://apna.co', category: 'General' },
+        { name: 'Shine', icon: 'fa-solid fa-sun', color: '#fdd835', url: 'https://www.shine.com', category: 'General' },
+        { name: 'Freshersworld', icon: 'fa-solid fa-user-graduate', color: '#ff7043', url: 'https://www.freshersworld.com', category: 'General' },
+        { name: 'TimesJobs', icon: 'fa-solid fa-newspaper', color: '#1e88e5', url: 'https://www.timesjobs.com', category: 'General' },
+        { name: 'Naukri Gulf', icon: 'fa-solid fa-plane-up', color: '#1565c0', url: 'https://www.naukrigulf.com', category: 'General' },
+        { name: 'Youth4work', icon: 'fa-solid fa-users-viewfinder', color: '#00d084', url: 'https://www.youth4work.com', category: 'General' },
+        { name: 'Jooble', icon: 'fa-solid fa-magnifying-glass-location', color: '#f9a825', url: 'https://jooble.org', category: 'General' }
     ];
 
     const trendingJobs = [
@@ -240,22 +261,31 @@ const Resources = () => {
                         </div>
 
                         {/* Portal Integration Cards */}
-                        <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '1.5rem', color: '#0f172a' }}>Direct Portal Access</h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '4rem' }}>
-                            {jobPortals.map((portal) => (
-                                <motion.a
-                                    key={portal.name}
-                                    href={portal.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    whileHover={{ y: -5, background: '#f8fafc' }}
-                                    style={{ background: 'white', border: '1px solid #e2e8f0', padding: '1.5rem', borderRadius: '20px', textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem', transition: '0.3s' }}
-                                >
-                                    <div style={{ width: '50px', height: '50px', borderRadius: '12px', background: `${portal.color}15`, color: portal.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem' }}>
-                                        <i className={portal.icon}></i>
+                        <div style={{ marginBottom: '4rem' }}>
+                            {['Premium', 'Tech', 'Remote', 'General'].map(cat => (
+                                <div key={cat} style={{ marginBottom: '2.5rem' }}>
+                                    <h2 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '1.25rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <div style={{ width: '3px', height: '20px', background: cat === 'Premium' ? '#3b82f6' : cat === 'Tech' ? '#10b981' : cat === 'Remote' ? '#ec4899' : '#f59e0b', borderRadius: '2px' }}></div>
+                                        {cat} Portals
+                                    </h2>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.25rem' }}>
+                                        {jobPortals.filter(p => p.category === cat).map((portal) => (
+                                            <motion.a
+                                                key={portal.name}
+                                                href={portal.url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                whileHover={{ y: -5, background: '#f8fafc', borderColor: portal.color }}
+                                                style={{ background: 'white', border: '1px solid #e2e8f0', padding: '1.25rem', borderRadius: '18px', textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', transition: '0.3s' }}
+                                            >
+                                                <div style={{ width: '45px', height: '45px', borderRadius: '10px', background: `${portal.color}15`, color: portal.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>
+                                                    <i className={portal.icon}></i>
+                                                </div>
+                                                <span style={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem' }}>{portal.name}</span>
+                                            </motion.a>
+                                        ))}
                                     </div>
-                                    <span style={{ fontWeight: 800, color: '#0f172a', fontSize: '1.1rem' }}>{portal.name}</span>
-                                </motion.a>
+                                </div>
                             ))}
                         </div>
 
