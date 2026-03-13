@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { genAI } from '../services/gemini';
 import Editor from 'react-simple-code-editor';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-javascript';
+import { highlight, languages } from '../services/prism';
 import 'prismjs/themes/prism.css';
 
 const TestSystem = () => {
@@ -299,7 +298,7 @@ Return ONLY a valid JSON object, no markdown or backticks:
                                 <Editor
                                     value={codeDraft}
                                     onValueChange={setCodeDraft}
-                                    highlight={code => Prism.highlight(code, Prism.languages.javascript, 'javascript')}
+                                    highlight={code => highlight(code, languages.javascript, 'javascript')}
                                     padding={10}
                                     style={{
                                         fontFamily: '"Fira Code", "Consolas", monospace',

@@ -122,12 +122,54 @@ const Header = ({
         { id: 'contact', label: 'Contact' }
     ];
 
-    const notifications = [
-        { icon: 'fa-book-open-reader', color: '#3b82f6', bg: '#eff6ff', title: 'Learning Milestone', desc: 'Complete your React Masterclass to earn the Golden Badge.', time: '2 hours ago' },
-        { icon: 'fa-people-group', color: '#ec4899', bg: '#fdf2f8', title: 'Community Mention', desc: 'Alex River replied to your post in System Design.', time: '5 hours ago' },
-        { icon: 'fa-swatchbook', color: '#10b981', bg: '#ecfdf5', title: 'Library Suggestion', desc: 'Based on your reading, we suggest "Clean Architecture".', time: '1 day ago' },
-        { icon: 'fa-gamepad', color: '#f59e0b', bg: '#fffbeb', title: 'Game Challenge', desc: 'Your high score in Prompt Game was beaten by User45.', time: '2 days ago' },
-    ];
+    const [notifications, setNotifications] = useState([]);
+
+    useEffect(() => {
+        const fetchNotifs = async () => {
+            try {
+                const auth = JSON.parse(localStorage.getItem('auth'));
+                if (!auth) return;
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/notifications`, {
+                    headers: { 'Authorization': `Bearer ${auth.token}` }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setNotifications(data.data.map(n => ({
+                        id: n.id,
+                        icon: n.icon || 'fa-info-circle',
+                        color: n.color || '#3b82f6',
+                        bg: n.color ? `${n.color}10` : '#eff6ff',
+                        title: n.title,
+                        desc: n.message,
+                        time: new Date(n.createdAt).toLocaleLowerCase().includes('today') ? 'Recently' : new Date(n.createdAt).toLocaleDateString(),
+                        read: n.read
+                    })));
+                }
+            } catch (err) {
+                console.error("Header notif fetch error:", err);
+            }
+        };
+
+        fetchNotifs();
+        // Refresh every 30 seconds for real-time feel
+        const interval = setInterval(fetchNotifs, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
+    const unreadCount = notifications.filter(n => !n.read).length;
+
+    const markAllRead = async () => {
+        try {
+            const auth = JSON.parse(localStorage.getItem('auth'));
+            await fetch(`${import.meta.env.VITE_API_URL}/api/v1/notifications/read-all`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${auth.token}` }
+            });
+            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        } catch (err) {
+            console.error("Mark all read error:", err);
+        }
+    };
 
     // ─── Minimal Mode ───────────────────────────────────────────────────
     const minimalNavModes = ['escapechallenge', 'aisurvivalclimb', 'codeescapehouse', 'elearning', 'multiplayer'];
@@ -294,16 +336,16 @@ const Header = ({
                             title="Notifications"
                         >
                             <i className="fa-solid fa-bell" />
-                            <span className="unav-badge">3</span>
+                            {unreadCount > 0 && <span className="unav-badge">{unreadCount}</span>}
                         </button>
                         {showNotifications && (
                             <div className="unav-dropdown notif-panel slide-down">
                                 <div className="unav-drop-header">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <h4>Notifications</h4>
-                                        <span className="unav-count-badge">3 New</span>
+                                        {unreadCount > 0 && <span className="unav-count-badge">{unreadCount} New</span>}
                                     </div>
-                                    <button className="unav-mark-read">
+                                    <button className="unav-mark-read" onClick={markAllRead}>
                                         <i className="fa-solid fa-check-double" /> Mark all read
                                     </button>
                                 </div>

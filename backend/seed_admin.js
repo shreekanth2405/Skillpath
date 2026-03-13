@@ -20,7 +20,10 @@ const seedAdmin = async () => {
                 where: { email: 'admin@admin.com' },
                 data: {
                     password: hashedPassword,
-                    role: 'admin'
+                    role: 'admin',
+                    skills: ['React', 'Node.js', 'Python', 'PostgreSQL', 'AWS'],
+                    preferredLocation: ['Bangalore', 'Remote'],
+                    experienceLevel: 'Senior'
                 }
             });
         } else {
@@ -30,7 +33,10 @@ const seedAdmin = async () => {
                     name: 'Admin User',
                     email: 'admin@admin.com',
                     password: hashedPassword,
-                    role: 'admin'
+                    role: 'admin',
+                    skills: ['React', 'Node.js', 'Python', 'PostgreSQL', 'AWS'],
+                    preferredLocation: ['Bangalore', 'Remote'],
+                    experienceLevel: 'Senior'
                 }
             });
         }

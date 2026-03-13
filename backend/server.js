@@ -5,6 +5,7 @@ const prisma = require('./prismaClient');
 const PORT = process.env.PORT || 5000;
 
 
+
 // Connect to Database
 const connectDB = async () => {
     try {

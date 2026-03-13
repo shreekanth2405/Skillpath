@@ -1,3 +1,4 @@
+console.log('App.jsx STARTING');
 import { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { genAI, skillPathSystemInstruction } from './services/gemini';

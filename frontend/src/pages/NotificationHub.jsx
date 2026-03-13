@@ -109,60 +109,87 @@ const NotificationCard = ({ type, title, content, timestamp, extra, icon, onDism
 
 const NotificationHub = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [notifications, setNotifications] = useState([
-        {
-            id: 1,
-            type: 'info',
-            icon: 'fa-chart-line',
-            title: 'Confidence Score Updated',
-            content: 'Your AI Confidence Score has increased significantly following your recent project additions.',
-            timestamp: '2 mins ago',
-            extra: (
-                <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '10px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#10b981' }}>82% → 87%</div>
-                    <div style={{ color: '#10b981', fontWeight: 900 }}><i className="fa-solid fa-arrow-up"></i> +5%</div>
-                </div>
-            )
-        },
-        {
-            id: 2,
-            type: 'warning',
-            icon: 'fa-bolt-lightning',
-            title: 'Prediction Volatility Detected',
-            content: 'Recent market changes are affecting prediction stability for Cloud roles.',
-            timestamp: '1 hour ago',
-            extra: (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ background: '#f59e0b20', color: '#f59e0b', padding: '4px 12px', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 800 }}>MODERATE RISK</div>
-                    <button style={{ background: 'white', color: '#0f172a', border: 'none', padding: '4px 12px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer' }}>VIEW BREAKDOWN</button>
-                </div>
-            )
-        },
-        {
-            id: 3,
-            type: 'suggestion',
-            icon: 'fa-wand-magic-sparkles',
-            title: 'Improve Your Confidence Score',
-            content: 'Add "Neural Networks" to your skill tree to boost confidence.',
-            timestamp: '3 hours ago',
-            extra: (
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <div style={{ flex: 1, border: '1px dashed #10b981', padding: '8px', borderRadius: '8px', color: '#10b981', fontSize: '0.8rem', textAlign: 'center' }}>+4% Potential</div>
-                    <button style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 800, cursor: 'pointer' }}>UPDATE PROFILE</button>
-                </div>
-            )
-        }
-    ]);
-
+    const [notifications, setNotifications] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [toasts, setToasts] = useState([]);
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const fetchNotifications = async () => {
+        try {
+            const auth = JSON.parse(localStorage.getItem('auth'));
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/notifications`, {
+                headers: {
+                    'Authorization': `Bearer ${auth.token}`
+                }
+            });
+            const data = await res.json();
+            if (data.success) {
+                setNotifications(data.data);
+            }
+        } catch (err) {
+            console.error("Error fetching notifications:", err);
+            addToast("Failed to sync notifications", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const addToast = (msg, type) => {
         const id = Date.now();
         setToasts(prev => [...prev, { id, msg, type }]);
     };
 
-    const removeNotification = (id) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
+    const removeNotification = async (id) => {
+        try {
+            const auth = JSON.parse(localStorage.getItem('auth'));
+            await fetch(`${import.meta.env.VITE_API_URL}/api/v1/notifications/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${auth.token}`
+                }
+            });
+            setNotifications(prev => prev.filter(n => n.id !== id));
+            addToast("Notification dismissed", "info");
+        } catch (err) {
+            console.error("Error deleting notification:", err);
+        }
+    };
+
+    const markAsRead = async (id) => {
+        try {
+            const auth = JSON.parse(localStorage.getItem('auth'));
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/notifications/${id}/read`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${auth.token}`
+                }
+            });
+            const data = await res.json();
+            if (data.success) {
+                setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+            }
+        } catch (err) {
+            console.error("Error marking as read:", err);
+        }
+    };
+
+    const markAllRead = async () => {
+        try {
+            const auth = JSON.parse(localStorage.getItem('auth'));
+            await fetch(`${import.meta.env.VITE_API_URL}/api/v1/notifications/read-all`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${auth.token}`
+                }
+            });
+            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+            addToast("All notifications marked as read", "success");
+        } catch (err) {
+            console.error("Error marking all read:", err);
+        }
     };
 
     return (

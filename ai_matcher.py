@@ -1,90 +1,92 @@
 import json
 import psycopg2
+from psycopg2.extras import execute_values
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import uuid
+import os
+from datetime import datetime
+from dotenv import load_dotenv
 
-# Connect to database
-# In a real scenario, this connects to the identical `skillpath` DB used by Prisma.
-# For demonstration passing, we mock the inputs here.
+# Load environment variables
+load_dotenv('backend/.env')
+DB_URL = os.getenv('DATABASE_URL')
+if DB_URL and "?" in DB_URL:
+    DB_URL = DB_URL.split("?")[0]
 
-print("--- AI Semantic Matching Engine Initializing ---")
-print("Loading NLP Vectors...")
+def get_db_connection():
+    try:
+        conn = psycopg2.connect(DB_URL)
+        return conn
+    except Exception as e:
+        print(f"Error connecting to database: {e}")
+        return None
 
-# Mock User Profile
-user_profile = {
-    "name": "Jane Doe",
-    "role": "Software Developer",
-    "experience": "Fresher",
-    "location": "Bangalore",
-    "skills": ["Python", "React", "Machine Learning", "SQL", "Git"]
-}
-
-# Mock New Scraped Jobs
-scraped_jobs = [
-    {
-        "id": "job_001",
-        "title": "Machine Learning Engineer",
-        "company": "DeepMind",
-        "location": "Remote",
-        "skills": ["Python", "Machine Learning", "TensorFlow", "SQL", "Git"]
-    },
-    {
-        "id": "job_002",
-        "title": "Frontend React Developer",
-        "company": "Vercel",
-        "location": "San Francisco",
-        "skills": ["React", "JavaScript", "TypeScript", "Next.js", "CSS"]
-    },
-    {
-        "id": "job_003",
-        "title": "Full Stack Engineer",
-        "company": "Startup Inc",
-        "location": "Bangalore",
-        "skills": ["Python", "React", "SQL", "AWS", "Git"]
-    }
-]
-
-# Create a text document for the user comprising of their core competencies
-user_text = f"{user_profile['role']} {' '.join(user_profile['skills'])}"
-
-def calculate_match_score(user_text, job):
-    # Create a text document for the job
-    job_text = f"{job['title']} {' '.join(job['skills'])}"
-    
-    # Use TF-IDF to create vector embeddings of the texts
+def calculate_match_score(user_text, job_text, user_location, job_location):
     vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform([user_text, job_text])
+    try:
+        tfidf_matrix = vectorizer.fit_transform([user_text, job_text])
+        similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+    except:
+        similarity = 0.0
     
-    # Calculate Cosine Similarity between the User Vector and Job Vector
-    # cosine_similarity returns a matrix, [0][1] gets the correlation between doc1 and doc2
-    similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
-    
-    # Scale to a 0-100 percentage
     base_score = float(similarity * 100)
     
-    # Add weighting logic mentioned in architecture
-    # e.g., location match bonus
-    if job['location'] in [user_profile['location'], 'Remote']:
+    # Simple location match logic
+    if any(loc in (user_location or []) for loc in (job_location or [])) or "Remote" in (job_location or []):
         base_score += 10
         
-    # Cap at 100%
     return min(100.0, round(base_score, 1))
 
-print(f"\nAnalyzing {len(scraped_jobs)} jobs against User: {user_profile['name']}...")
-print("-" * 50)
+print("--- AI Semantic Matching Engine Initializing ---")
 
-for job in scraped_jobs:
-    score = calculate_match_score(user_text, job)
-    
-    # Calculate missing skills completely separate from the vector math (Skill Gap Analysis)
-    missing_skills = list(set(job['skills']) - set(user_profile['skills']))
-    
-    print(f"Job: {job['title']} @ {job['company']}")
-    print(f"Relevance Score: {score}%")
-    print(f"Skill Gap: {', '.join(missing_skills) if missing_skills else 'None - Perfect Match!'}")
-    
-    if score >= 80:
-        print("[!] 🚨 TRIGGERING HIGH MATCH NOTIFICATION via Node.js Webhook 🚨")
-    print("-" * 50)
+conn = get_db_connection()
+if not conn:
+    exit(1)
 
-print("AI Matching Cycle complete.")
+cur = conn.cursor()
+try:
+    # 1. Fetch Users
+    cur.execute('SELECT "id", "name", "skills", "preferredLocation" FROM "User"')
+    users = cur.fetchall()
+    
+    # 2. Fetch Jobs
+    cur.execute('SELECT "id", "jobTitle", "skillsRequired", "location" FROM "Job"')
+    jobs = cur.fetchall()
+    
+    print(f"Analyzing {len(jobs)} jobs against {len(users)} users...")
+    
+    match_data = []
+    
+    for u_id, u_name, u_skills, u_loc in users:
+        user_text = " ".join(u_skills or [])
+        
+        for j_id, j_title, j_skills, j_loc in jobs:
+            job_text = f"{j_title} {' '.join(j_skills or [])}"
+            score = calculate_match_score(user_text, job_text, u_loc, j_loc)
+            
+            # Simple Skill Gap
+            skill_gap = list(set(j_skills or []) - set(u_skills or []))
+            
+            # Prepare for insertion
+            match_data.append((
+                str(uuid.uuid4()), u_id, j_id, score, 'New', skill_gap, False, datetime.now()
+            ))
+
+    # 3. Batch Insert Matches
+    if match_data:
+        print(f"Upserting {len(match_data)} job matches into PostgreSQL...")
+        execute_values(cur, """
+            INSERT INTO "JobMatch" ("id", "userId", "jobId", "relevanceScore", "matchStatus", "skillGap", "notified", "createdAt")
+            VALUES %s
+            ON CONFLICT DO NOTHING
+        """, match_data)
+        conn.commit()
+        print("Matching cycle complete.")
+
+except Exception as e:
+    print(f"Error during matching: {e}")
+    conn.rollback()
+finally:
+    cur.close()
+    conn.close()

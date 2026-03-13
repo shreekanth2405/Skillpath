@@ -78,6 +78,8 @@ app.use('/api/v1/bookmarks', require('./routes/bookmarkRoutes'));
 app.use('/api/v1/events', require('./routes/eventRoutes'));
 app.use('/api/v1/certifications', require('./routes/certificationRoutes'));
 app.use('/api/v1/labs', require('./routes/labRoutes'));
+app.use('/api/v1/notifications', require('./routes/notificationRoutes'));
+app.use('/api/v1/community', require('./routes/communityRoutes'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {

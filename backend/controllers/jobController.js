@@ -156,45 +156,49 @@ exports.predictAndScan = async (req, res) => {
         const targetTitle = role || 'Software Developer';
 
         // Step 1: Execute Python NLP script (simulated pipeline)
-        const { exec } = require('child_process');
         exec('python ../scraper.py', (err, stdout, stderr) => {
             if (err) console.error("Scraper Error:", err);
+            
             exec('python ../ai_matcher.py', async (err2, stdout2, stderr2) => {
-                if (err2) console.error("Matcher Error:", err2);
+                if (err2) {
+                    console.error("Matcher Error:", err2);
+                    return res.status(500).json({ success: false, error: 'AI Matching Engine failed' });
+                }
 
-                // Step 2: Actually seed the database with dynamic jobs reflecting their search!
-                const newJob = await prisma.job.create({
-                    data: {
-                        sourceUrl: `https://www.linkedin.com/jobs/view/${Math.floor(Math.random() * 100000)}`,
-                        sourceDomain: 'linkedin.com',
-                        companyName: ['Microsoft', 'Amazon', 'Google', 'Meta', 'Netflix', 'Tesla'][Math.floor(Math.random() * 6)],
-                        jobTitle: targetTitle,
-                        location: [['Seattle'], ['Remote'], ['San Francisco'], ['New York']][Math.floor(Math.random() * 4)],
-                        experienceRequired: '2+ years',
-                        skillsRequired: ['Python', 'React', 'AWS', 'Node.js', 'PostgreSQL'],
-                        rawDescription: 'Simulated output from AI Scraper NLP layer...',
-                        postedAt: new Date(),
-                        discoveredAt: new Date(),
-                        isDuplicate: false,
-                    }
+                // Step 2: Fetch the latest high-score matches for this user
+                const latestMatches = await prisma.jobMatch.findMany({
+                    where: { userId: req.user.id },
+                    include: { job: true },
+                    orderBy: { createdAt: 'desc' },
+                    take: 5
                 });
 
-                const newMatch = await prisma.jobMatch.create({
-                    data: {
-                        userId: req.user.id,
-                        jobId: newJob.id,
-                        relevanceScore: Math.floor(Math.random() * 20) + 75, // 75-95%
-                        matchStatus: 'New',
-                        skillGap: ['GraphQL', 'Docker']
-                    },
-                    include: {
-                        job: true
+                // Step 3: Create notifications for high score matches (>= 85)
+                for (const match of latestMatches) {
+                    if (match.relevanceScore >= 85 && !match.notified) {
+                        await prisma.notification.create({
+                            data: {
+                                userId: req.user.id,
+                                type: 'JobMatch',
+                                title: 'High Relevance Job Found!',
+                                message: `We found a ${match.job.jobTitle} position at ${match.job.companyName} that matches your skills by ${match.relevanceScore}%.`,
+                                icon: 'fa-briefcase',
+                                color: '#3b82f6'
+                            }
+                        });
+
+                        // Update match to avoid double notification
+                        await prisma.jobMatch.update({
+                            where: { id: match.id },
+                            data: { notified: true, notifiedAt: new Date() }
+                        });
                     }
-                });
+                }
 
                 res.status(200).json({
                     success: true,
-                    data: newMatch,
+                    data: latestMatches[0] || null, // Return the top recent match
+                    allMatches: latestMatches,
                     logs: stdout2 + stdout
                 });
             });

@@ -184,6 +184,10 @@ const PostCard = ({ post }) => {
 
 const CommunityHub = () => {
     const [activeNav, setActiveNav] = useState('Home');
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newPost, setNewPost] = useState({ title: '', content: '', tag: 'General' });
 
     const navItems = [
         { name: 'Home', icon: 'fa-house' },
@@ -206,30 +210,56 @@ const CommunityHub = () => {
         { name: 'Dan Abramov', role: 'Senior Dev', avatar: 'https://i.pravatar.cc/150?u=dan', skills: ['React', 'Compiler'], connections: 890, experience: 'Lvl 99', isConnection: true }
     ];
 
-    const posts = [
-        {
-            userName: 'Alex River',
-            userAvatar: 'https://i.pravatar.cc/150?u=alex',
-            timestamp: '2 hours ago',
-            tag: 'CareerAdvice',
-            title: 'How I landed my first Senior role in 3 years',
-            content: 'The key wasn’t just coding—it was understanding the business value of my features. I started asking "Why?" instead of just "How?". Here are 5 tips for mid-level devs looking to level up...',
-            likes: 156,
-            comments: 42,
-            aiRecommended: true
-        },
-        {
-            userName: 'Jaya Singh',
-            userAvatar: 'https://i.pravatar.cc/150?u=jaya',
-            timestamp: '5 hours ago',
-            tag: 'FullStack',
-            title: 'Building a Micro-SaaS with Next.js and Supabase',
-            content: 'I just finished my first deployment! The developer experience with Supabase is unmatched. If you are struggling with auth or real-time DBs, check this out...',
-            likes: 89,
-            comments: 12,
-            aiRecommended: false
+    useEffect(() => {
+        fetchPosts();
+    }, []);
+
+    const fetchPosts = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/community/posts`);
+            const data = await res.json();
+            if (data.success) {
+                setPosts(data.data.map(p => ({
+                    id: p.id,
+                    userName: p.user.name,
+                    userAvatar: `https://ui-avatars.com/api/?name=${p.user.name}&background=random`,
+                    timestamp: new Date(p.createdAt).toLocaleDateString(),
+                    tag: p.tag || 'General',
+                    title: p.title,
+                    content: p.content,
+                    likes: p.likes,
+                    comments: p._count.comments,
+                    aiRecommended: p.likes > 10
+                })));
+            }
+        } catch (err) {
+            console.error("Error fetching posts:", err);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
+
+    const handleCreatePost = async () => {
+        try {
+            const auth = JSON.parse(localStorage.getItem('auth'));
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/community/posts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${auth.token}`
+                },
+                body: JSON.stringify(newPost)
+            });
+            const data = await res.json();
+            if (data.success) {
+                setShowCreateModal(false);
+                setNewPost({ title: '', content: '', tag: 'General' });
+                fetchPosts();
+            }
+        } catch (err) {
+            console.error("Error creating post:", err);
+        }
+    };
 
     return (
         <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '2rem', fontFamily: "'Outfit', sans-serif" }}>
@@ -284,7 +314,11 @@ const CommunityHub = () => {
                     <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h1 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#1e293b' }}>Skill Path AI Community Feed</h1>
                         <div style={{ display: 'flex', gap: '8px' }}>
-                            <button className="hover-3d" style={{ padding: '10px 24px', borderRadius: '12px', background: '#3b82f6', color: 'white', border: 'none', fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 10px rgba(59,130,246,0.3)', transition: '0.3s' }}>
+                            <button 
+                                onClick={() => setShowCreateModal(true)}
+                                className="hover-3d" 
+                                style={{ padding: '10px 24px', borderRadius: '12px', background: '#3b82f6', color: 'white', border: 'none', fontWeight: 800, cursor: 'pointer', boxShadow: '0 4px 10px rgba(59,130,246,0.3)', transition: '0.3s' }}
+                            >
                                 <i className="fa-solid fa-plus" style={{ marginRight: '8px' }}></i> Create Post
                             </button>
                         </div>
@@ -365,6 +399,68 @@ const CommunityHub = () => {
                 </div>
 
             </div>
+        </div>
+
+            {/* Create Post Modal */}
+            <AnimatePresence>
+                {showCreateModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            style={{ background: 'white', borderRadius: '24px', width: '100%', maxWidth: '600px', padding: '2rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}
+                        >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                <h2 style={{ fontSize: '1.5rem', fontWeight: 900 }}>Create Community Post</h2>
+                                <button onClick={() => setShowCreateModal(false)} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#64748b' }}>
+                                    <i className="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                <input 
+                                    type="text" 
+                                    placeholder="Catchy Title" 
+                                    value={newPost.title}
+                                    onChange={e => setNewPost({...newPost, title: e.target.value})}
+                                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '1rem', outline: 'none' }}
+                                />
+                                <select 
+                                    value={newPost.tag}
+                                    onChange={e => setNewPost({...newPost, tag: e.target.value})}
+                                    style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '1rem', outline: 'none', background: 'white' }}
+                                >
+                                    <option>General</option>
+                                    <option>CareerAdvice</option>
+                                    <option>TechStack</option>
+                                    <option>Q&A</option>
+                                    <option>Showcase</option>
+                                </select>
+                                <textarea 
+                                    placeholder="What's on your mind? Use #tags to categorize..." 
+                                    rows={6}
+                                    value={newPost.content}
+                                    onChange={e => setNewPost({...newPost, content: e.target.value})}
+                                    style={{ width: '100%', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '1rem', outline: 'none', resize: 'vertical' }}
+                                />
+                                <button 
+                                    onClick={handleCreatePost}
+                                    disabled={!newPost.title || !newPost.content}
+                                    style={{ background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 800, cursor: 'pointer', fontSize: '1rem' }}
+                                >
+                                    Share with Community
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

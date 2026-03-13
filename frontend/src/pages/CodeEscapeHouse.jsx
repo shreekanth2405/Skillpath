@@ -1,21 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Editor from 'react-simple-code-editor';
-import 'prismjs/components/prism-clike';
-import 'prismjs/components/prism-javascript';
+import { highlight, languages } from '../services/prism';
 import 'prismjs/themes/prism-tomorrow.css';
 import { jsPDF } from 'jspdf';
 import { ESCAPE_ROOMS_DATA } from '../data/challengesMaster';
 import { motion, AnimatePresence } from 'framer-motion';
 import { genAI } from '../services/gemini';
 import './CodeEscapeHouse.css';
-
-// Import Prism components for more languages
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-java';
-import 'prismjs/components/prism-cpp';
-import 'prismjs/components/prism-c';
-import 'prismjs/components/prism-sql';
-import { highlight, languages } from 'prismjs/components/prism-core';
 
 const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
   // STATE
@@ -84,6 +75,10 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
         });
         const subData = await subRes.json();
         submissions = subData.data || [];
+      }
+
+      if (!data.success || !Array.isArray(data.data)) {
+        throw new Error("Invalid labs data format");
       }
 
       const labs = data.data.sort((a, b) => a.roomNumber - b.roomNumber);
@@ -336,6 +331,13 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
   const level = Math.floor(userScore / 1000) + 1;
   const completedRoomsCount = rooms.filter(r => r.completed).length;
 
+  if (loading) return (
+    <div style={{ height: '100vh', width: '100vw', background: '#0f172a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#0ff', fontFamily: 'Orbitron' }}>
+      <motion.i className="fa-solid fa-microchip" animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.5, repeat: Infinity }} style={{ fontSize: '4rem', marginBottom: '20px' }}></motion.i>
+      <div style={{ fontSize: '1.5rem', letterSpacing: '4px' }}>INITIALIZING SECTORS...</div>
+    </div>
+  );
+
   return (
     <div className="dashboard-container" ref={containerRef}>
       {/* Overlay Animation */}
@@ -559,7 +561,7 @@ const CodeEscapeHouse = ({ setActiveTab, userCoins, setUserCoins }) => {
           <div className="stat-item"><i className="fa-solid fa-star"></i> Level <span className="stat-val">{level}</span></div>
           <div className="stat-item"><i className="fa-solid fa-gem"></i> Score <span className="stat-val">{userScore}</span></div>
           <div className="stat-item"><i className="fa-solid fa-house-lock"></i> Unlocked <span className="stat-val">{completedRoomsCount}/120</span></div>
-          <div className="stat-item"><i className="fa-solid fa-network-wired"></i> Domain <span className="stat-val" style={{ color: '#ffffff' }}>{activeRoom?.domain.toUpperCase()}</span></div>
+          <div className="stat-item"><i className="fa-solid fa-network-wired"></i> Domain <span className="stat-val" style={{ color: '#ffffff' }}>{activeRoom?.domain?.toUpperCase() || 'SCANNING...'}</span></div>
         </div>
         <div className="top-actions" style={{ display: 'flex', gap: '20px' }}>
           <i className="fa-solid fa-expand" onClick={toggleFullScreen} title="Toggle Fullscreen"></i>
