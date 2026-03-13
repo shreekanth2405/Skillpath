@@ -188,7 +188,7 @@ const Dashboard = ({ setActiveTab, userXP, userLevel, userCoins, user }) => {
                                         Practical Hub — Hands-On Labs
                                     </h3>
                                     <p style={{ color: '#94a3b8', fontSize: '0.95rem', margin: 0 }}>
-                                        Explore 240+ labs across 8 domains: Web Dev, AI/ML, Data Science, Cybersecurity, Cloud, Mobile, Blockchain & Game Dev
+                                        Explore 500+ labs across 20 domains: Web Dev, AI/ML, Data Science, Cybersecurity, Cloud, DSA, Database, UI/UX, System Design & more
                                     </p>
                                 </div>
                             </div>
