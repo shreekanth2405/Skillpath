@@ -54,6 +54,22 @@ const Resources = () => {
                     ]
                 },
                 {
+                    title: 'Core Engineering', icon: 'fa-gears', color: '#475569',
+                    subs: [
+                        { title: 'Mechanical', subjects: [{ name: 'Mechanics & Thermo', books: ['Engineering Mechanics by Meriam & Kraige', 'Engineering Thermodynamics by P.K. Nag', 'Heat and Mass Transfer by R.K. Rajput'] }] },
+                        { title: 'Civil', subjects: [{ name: 'Structure', books: ['Structural Analysis by R.C. Hibbeler', 'Mechanics of Solids by S.S. Bhavikatti', 'RCC Design by B.C. Punmia'] }] },
+                        { title: 'Chemical', subjects: [{ name: 'Processes', books: ['Elements of Chemical Reaction Engineering by Fogler', 'Unit Operations of Chemical Engineering by McCabe Smith'] }] },
+                        { title: 'Electrical', subjects: [{ name: 'Circuits', books: ['Electrical Technology by B.L. Theraja', 'Signals and Systems by Oppenheim'] }] }
+                    ]
+                },
+                {
+                    title: 'Biotech & Science', icon: 'fa-dna', color: '#ec4899',
+                    subs: [
+                        { title: 'Life Sciences', subjects: [{ name: 'Molecular', books: ['Molecular Biology of the Cell by Alberts', 'Lehninger Principles of Biochemistry', 'Genetics by Pierce'] }] },
+                        { title: 'Environment', subjects: [{ name: 'Ecology', books: ['Silent Spring by Rachel Carson', 'Environmental Science by G. Tyler Miller', 'Ecology by Odum'] }] }
+                    ]
+                },
+                {
                     title: 'Advanced Tech', icon: 'fa-rocket', color: '#8b5cf6',
                     subs: [
                         { title: 'DevOps & Cloud', subjects: [{ name: 'Infrastructure', books: ['Site Reliability Engineering by Google', 'The Phoenix Project', 'Docker Deep Dive by Nigel Poulton', 'Kubernetes Up & Running', 'Terraform Up & Running'] }] },
@@ -72,10 +88,10 @@ const Resources = () => {
                     ]
                 },
                 {
-                    title: 'Business & Finance', icon: 'fa-briefcase', color: '#f59e0b',
+                    title: 'Commerce & Finance', icon: 'fa-chart-pie', color: '#10b981',
                     subs: [
-                        { title: 'Management', subjects: [{ name: 'Business Strategy', books: ['Good to Great by Jim Collins', 'The Lean Startup by Eric Ries', 'Zero to One by Peter Thiel', 'The Hard Thing About Hard Things'] }] },
-                        { title: 'Investment', subjects: [{ name: 'Finance', books: ['The Intelligent Investor by Benjamin Graham', 'Rich Dad Poor Dad by Robert Kiyosaki', 'Principles by Ray Dalio', 'The Psychology of Money', 'Thinking, Fast and Slow'] }] }
+                        { title: 'Economics', subjects: [{ name: 'Macro/Micro', books: ['Principles of Economics by N. Gregory Mankiw', 'Wealth of Nations by Adam Smith', 'Capital in the Twenty-First Century'] }] },
+                        { title: 'Business', subjects: [{ name: 'Enterprise', books: ['Financial Accounting by Weygandt', 'Marketing Management by Philip Kotler', 'The Lean Startup', 'Good to Great'] }] }
                     ]
                 },
                 {
@@ -86,17 +102,17 @@ const Resources = () => {
                     ]
                 },
                 {
-                    title: 'Medical', icon: 'fa-staff-snake', color: '#10b981',
+                    title: 'Medical', icon: 'fa-staff-snake', color: '#ef4444',
                     subs: [
                         { title: 'Clinical', subjects: [{ name: 'Anatomy & Physio', books: ['Gray’s Anatomy', 'Harrison\'s Principles of Internal Medicine', 'Guyton and Hall Medical Physiology'] }] },
-                        { title: 'Nursing', subjects: [{ name: 'Specialties', books: ['Pediatrics Nursing', 'Brunner & Suddarth’s Nursing'] }] }
+                        { title: 'Specialties', subjects: [{ name: 'Pharmacology', books: ['Katzung Basic & Clinical Pharmacology', 'Goodman & Gilman\'s Pharmacology'] }] }
                     ]
                 },
                 {
                     title: 'Law & Humanity', icon: 'fa-scale-balanced', color: '#64748b',
                     subs: [
                         { title: 'Law', subjects: [{ name: 'Jurisprudence', books: ['Black\'s Law Dictionary', 'The Constitution of India', 'Contract Law by Pollock & Mulla'] }] },
-                        { title: 'Social Science', subjects: [{ name: 'Philosophy', books: ['Beyond Good and Evil by Nietzsche', 'The Republic by Plato', 'Meditations by Marcus Aurelius'] }] }
+                        { title: 'Social Science', subjects: [{ name: 'History & Philo', books: ['Sapiens: A Brief History of Humankind', 'The Republic by Plato', 'Beyond Good and Evil by Nietzsche', 'Meditations by Marcus Aurelius', 'Nicomachean Ethics by Aristotle'] }] }
                     ]
                 },
                 { 
@@ -110,7 +126,7 @@ const Resources = () => {
                     title: 'Self Growth', icon: 'fa-arrow-up-trending-dots', color: '#06b6d4', 
                     subs: [
                         { title: 'Productivity', subjects: [{ name: 'Habits', books: ['Atomic Habits by James Clear', 'Deep Work by Cal Newport', 'Get Things Done by David Allen', 'The 5 AM Club'] }] },
-                        { title: 'Mindset', subjects: [{ name: 'Psychology', books: ['Thinking, Fast and Slow by Kahneman', 'Man\'s Search for Meaning', 'The Power of Now'] }] }
+                        { title: 'Mindset', subjects: [{ name: 'Psychology', books: ['Thinking, Fast and Slow by Kahneman', 'Man\'s Search for Meaning', 'The Power of Now', 'Influence by Robert Cialdini', 'Predictably Irrational'] }] }
                     ] 
                 }
             ];
@@ -181,7 +197,16 @@ const Resources = () => {
         'Man\'s Search for Meaning': 'https://archive.org/download/mans-search-for-meaning-viktor-e.-frankl/Man%27s%20Search%20For%20Meaning%20-%20Viktor%20E.%20Frankl.pdf',
         'The Power of Now': 'https://archive.org/download/the-power-of-now-eckhart-tolle_202102/The%20Power%20of%20Now%20-%20Eckhart%20Tolle.pdf',
         'Indian Polity by M. Laxmikanth': 'https://archive.org/download/indian-polity-6th-edition-by-m.-laxmikanth/Indian%20Polity%206th%20Edition%20by%20M.%20Laxmikanth.pdf',
-        'Concepts of Physics by H.C. Verma': 'https://archive.org/download/conceptsofphysicsvol1h.c.verma_202003/Concepts%20of%20Physics%20Vol%201%20H.C.%20Verma.pdf'
+        'Concepts of Physics by H.C. Verma': 'https://archive.org/download/conceptsofphysicsvol1h.c.verma_202003/Concepts%20of%20Physics%20Vol%201%20H.C.%20Verma.pdf',
+        'Principles of Economics by N. Gregory Mankiw': 'https://archive.org/download/principles-of-economics-n.-gregory-mankiw-8th-edition/Principles%20of%20Economics%20N.%20Gregory%20Mankiw%208th%20Edition.pdf',
+        'Molecular Biology of the Cell by Alberts': 'https://archive.org/download/MolecularBiologyOfTheCell6thEdition/Molecular%20Biology%20of%20the%20Cell%206th%20Edition.pdf',
+        'Wealth of Nations by Adam Smith': 'https://www.gutenberg.org/files/3300/3300-h/3300-h.htm',
+        'Principles by Ray Dalio': 'https://archive.org/download/principles-life-and-work/Principles%20-%20Life%20and%20Work.pdf',
+        'Silent Spring by Rachel Carson': 'https://archive.org/download/SilentSpringByRachelCarson/Silent%20Spring%20by%20Rachel%20Carson.pdf',
+        'Sapiens: A Brief History of Humankind': 'https://archive.org/download/2011YuvalNoahHarariSapiensABriefHistoryOfHumankind/2011%20Yuval%20Noah%20Harari%20-%20Sapiens%20A%20Brief%20History%20Of%20Humankind.pdf',
+        'Contract Law by Pollock & Mulla': 'https://archive.org/download/pollockmullaonth00polluoft/pollockmullaonth00polluoft.pdf',
+        'Engineering Mechanics by Meriam & Kraige': 'https://archive.org/download/engineering-mechanics-dynamics-by-j.-l.-meriam-l.-g.-kraige-6th-edition/Engineering%20Mechanics%20Dynamics%20By%20J.%20L.%20Meriam%2C%20L.%20G.%20Kraige%206th%20Edition.pdf',
+        'Nicomachean Ethics by Aristotle': 'https://www.gutenberg.org/files/4300/4300-h/4300-h.htm'
     };
 
     // --- Action Handlers ---
