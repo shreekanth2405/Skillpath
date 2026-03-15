@@ -111,6 +111,14 @@ const Resources = () => {
         { title: 'DevOps Architect', salary: '₹15L - ₹35L', tags: ['Docker', 'AWS', 'K8s'] }
     ];
 
+    const pdfLinks = {
+        'Introduction to Algorithms by Thomas H. Cormen (CLRS)': 'https://web.mit.edu/6.c67/www/Textbook/Introduction_to_Algorithms_3rd_Edition.pdf',
+        'Grokking Algorithms by Aditya Bhargava': 'https://edu.anarcho-copy.org/Algorithm/grokking-algorithms-illustrated-guide-programmers-curious.pdf',
+        'Atomic Habits by James Clear': 'https://jamesclear.com/wp-content/uploads/2018/10/Atomic-Habits-Summary.pdf',
+        'The Algorithm Design Manual by Steven Skiena': 'https://archive.org/download/the-algorithm-design-manual/TheAlgorithmDesignManual.pdf',
+        'Cracking the Coding Interview by Gayle Laakmann McDowell': 'https://archive.org/download/cracking-the-coding-interview-6th-edition-gayle-laakmann-mcdowell/cracking-the-coding-interview-6th-edition-189-programming-questions-and-solutions.pdf'
+    };
+
     // --- Action Handlers ---
     const handleCategoryClick = (cat) => { setSelectedCategory(cat); setLevel(2); };
     const handleSubCategoryClick = (sub) => { setSelectedSubCategory(sub); setLevel(3); };
@@ -229,7 +237,19 @@ const Resources = () => {
                                                     </div>
                                                     <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>{book}</h4>
                                                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-                                                        <button onClick={() => navigate('/book-reader')} style={{ flex: 1, padding: '8px', background: '#e2e8f0', color: '#0f172a', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>Read</button>
+                                                         <button 
+                                                             onClick={() => {
+                                                                 const [title, author] = book.split(' by ');
+                                                                 const encodedTitle = encodeURIComponent(title);
+                                                                 const encodedAuthor = encodeURIComponent(author || 'Unknown');
+                                                                 // Use real PDF if available, otherwise fallback to placeholder
+                                                                 const pdfUrl = pdfLinks[book] || `https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf`; 
+                                                                 navigate(`/book-reader?title=${encodedTitle}&author=${encodedAuthor}&url=${encodeURIComponent(pdfUrl)}`);
+                                                             }} 
+                                                             style={{ flex: 1, padding: '8px', background: '#e2e8f0', color: '#0f172a', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}
+                                                         >
+                                                             Read
+                                                         </button>
                                                         <a href={`https://archive.org/search.php?query=${encodeURIComponent(book)}+AND+mediatype:texts`} target="_blank" rel="noreferrer" style={{ flex: 1.5, textDecoration: 'none', textAlign: 'center', padding: '8px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
                                                             <i className="fa-solid fa-download"></i> Archive
                                                         </a>

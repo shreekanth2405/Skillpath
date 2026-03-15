@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const BookReader = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [theme, setTheme] = useState('light');
     const [zoom, setZoom] = useState(100);
+
+    // Parse query params
+    const query = new URLSearchParams(location.search);
+    const bookTitle = query.get('title') || 'Educational Resource';
+    const bookAuthor = query.get('author') || 'SkillPath Library';
+    const pdfUrl = query.get('url') || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
 
     const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
@@ -33,8 +40,8 @@ const BookReader = () => {
                         background: 'transparent', border: 'none', color: isDark ? '#cbd5e1' : '#64748b', cursor: 'pointer', fontSize: '1.2rem'
                     }}><i className="fa-solid fa-arrow-left"></i></button>
                     <div>
-                        <h2 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 800 }}>Data Structures & Algorithms in Java</h2>
-                        <span style={{ fontSize: '0.85rem', color: isDark ? '#94a3b8' : '#64748b' }}>By Robert Lafore • Computer Science</span>
+                        <h2 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 800 }}>{bookTitle}</h2>
+                        <span style={{ fontSize: '0.85rem', color: isDark ? '#94a3b8' : '#64748b' }}>{bookAuthor}</span>
                     </div>
                 </div>
 
@@ -64,11 +71,8 @@ const BookReader = () => {
                         border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`
                     }}
                 >
-                    {/* Embedded PDF Viewer Placeholder - 
-                        In production, replace this with an actual PDF URL or react-pdf component. 
-                        We use iframe to render a sample document natively. */}
                     <iframe
-                        src="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf#toolbar=0&navpanes=0&scrollbar=0"
+                        src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
                         title="Book Reader"
                         style={{ width: '100%', height: '100%', border: 'none' }}
                     ></iframe>
@@ -82,7 +86,7 @@ const BookReader = () => {
                 borderTop: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`
             }}>
                 <button style={{ background: 'transparent', border: 'none', color: isDark ? '#cbd5e1' : '#64748b', cursor: 'pointer', fontSize: '1.2rem' }}><i className="fa-solid fa-chevron-left"></i></button>
-                <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>Page 1 of 432</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>Reading Mode Active</div>
                 <button style={{ background: 'transparent', border: 'none', color: isDark ? '#cbd5e1' : '#64748b', cursor: 'pointer', fontSize: '1.2rem' }}><i className="fa-solid fa-chevron-right"></i></button>
             </div>
         </div>
