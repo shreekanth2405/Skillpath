@@ -45,41 +45,75 @@ const Resources = () => {
 
     // --- Data Structure ---
     const libraryData = [
-        {
-            title: 'Engineering', icon: 'fa-microchip', color: '#3b82f6',
-            subs: [
                 {
-                    title: 'Computer Science',
-                    subjects: [
-                        { name: 'Data Structures & Algorithms', books: ['Introduction to Algorithms by Thomas H. Cormen (CLRS)', 'Grokking Algorithms by Aditya Bhargava', 'The Algorithm Design Manual by Steven Skiena', 'Cracking the Coding Interview by Gayle Laakmann McDowell'] },
-                        { name: 'Software Engineering', books: ['Clean Code by Robert C. Martin', 'The Pragmatic Programmer by Andrew Hunt', 'Refactoring by Martin Fowler', 'Design Patterns by Erich Gamma'] },
-                        { name: 'Core Basics', books: ['Eloquent JavaScript by Marijn Haverbeke', 'You Don\'t Know JS by Kyle Simpson', 'Structure and Interpretation of Computer Programs'] }
-                    ]
-                },
-                {
-                    title: 'Specialized Tech',
+                    title: 'Computer Science', icon: 'fa-microchip', color: '#3b82f6',
                     subs: [
-                        { title: 'DevOps & Cloud', subjects: [{ name: 'Infrastructure', books: ['Site Reliability Engineering by Google', 'The Phoenix Project', 'Docker Deep Dive by Nigel Poulton', 'Kubernetes Up & Running'] }] },
-                        { title: 'Web Development', books: [], subjects: [{ name: 'Frontend & Backend', books: ['Learning React by Alex Banks', 'Node.js Design Patterns', 'Fullstack React'] }] },
-                        { title: 'Artificial Intelligence', subjects: [{ name: 'Machine Learning', books: ['Deep Learning by Ian Goodfellow', 'Hands-On Machine Learning', 'Pattern Recognition and Machine Learning'] }] }
+                        { name: 'Data Structures & Algorithms', books: ['Introduction to Algorithms by Thomas H. Cormen (CLRS)', 'Grokking Algorithms by Aditya Bhargava', 'The Algorithm Design Manual by Steven Skiena', 'Cracking the Coding Interview by Gayle Laakmann McDowell', 'Common-Sense Guide to Data Structures and Algorithms'] },
+                        { name: 'Software Architecture', books: ['Clean Code by Robert C. Martin', 'The Pragmatic Programmer by Andrew Hunt', 'Refactoring by Martin Fowler', 'Design Patterns by Erich Gamma', 'Clean Architecture by Robert C. Martin', 'Building Microservices by Sam Newman'] },
+                        { name: 'Programming Languages', books: ['Eloquent JavaScript by Marijn Haverbeke', 'You Don\'t Know JS by Kyle Simpson', 'Python Crash Course by Eric Matthes', 'Effective Java by Joshua Bloch', 'The C Programming Language by Kernighan & Ritchie'] }
                     ]
                 },
-                { title: 'Mechanical', subjects: [{ name: 'Thermodynamics', books: ['Engineering Thermodynamics by P.K. Nag', 'Fundamentals of Thermodynamics by Claus Borgnakke'] }] },
-                { title: 'ECE', subjects: [{ name: 'Digital Electronics', books: ['Digital Design by M. Morris Mano', 'Microelectronic Circuits by Sedra & Smith'] }] },
-                { title: 'IT', subjects: [{ name: 'Networking', books: ['Computer Networks by Andrew S. Tanenbaum', 'Computer Networking: A Top-Down Approach'] }] }
-            ]
-        },
-        {
-            title: 'Medical', icon: 'fa-staff-snake', color: '#10b981',
-            subs: [
-                { title: 'MBBS', subjects: [{ name: 'Anatomy', books: ['Gray’s Anatomy', 'BD Chaurasia'] }] },
-                { title: 'Nursing', subjects: [{ name: 'Child Health', books: ['Pediatrics Nursing'] }] }
-            ]
-        },
-        { title: 'Novels', icon: 'fa-book-open', color: '#ec4899', subs: [{ title: 'All Novels', subjects: [{ name: 'Classic Novels', books: ['The Great Gatsby', '1984'] }] }] },
-        { title: 'Career Growth', icon: 'fa-chart-line', color: '#0ea5e9', subs: [{ title: 'Professional Dev', subjects: [{ name: 'Career Strategy', books: ['So Good They Can’t Ignore You', 'Deep Work'] }] }] },
-        { title: 'Self Development', icon: 'fa-person-arrow-up-from-line', color: '#14b8a6', subs: [{ title: 'Growth Mindset', subjects: [{ name: 'Mindset & Habits', books: ['Atomic Habits', 'The Power of Habit'] }] }] }
-    ];
+                {
+                    title: 'Advanced Tech', icon: 'fa-rocket', color: '#8b5cf6',
+                    subs: [
+                        { title: 'DevOps & Cloud', subjects: [{ name: 'Infrastructure', books: ['Site Reliability Engineering by Google', 'The Phoenix Project', 'Docker Deep Dive by Nigel Poulton', 'Kubernetes Up & Running', 'Terraform Up & Running'] }] },
+                        { title: 'Cybersecurity', subjects: [{ name: 'Hacking & Defense', books: ['The Web Application Hacker’s Handbook', 'Penetration Testing by Georgia Weidman', 'Social Engineering by Christopher Hadnagy', 'Practical Malware Analysis'] }] },
+                        { title: 'Data Science', subjects: [{ name: 'ML & AI', books: ['Deep Learning by Ian Goodfellow', 'Hands-On Machine Learning', 'Python for Data Analysis', 'Storytelling with Data', 'The Hundred-Page Machine Learning Book'] }] }
+                    ]
+                },
+                {
+                    title: 'Exams & Competitive', icon: 'fa-graduation-cap', color: '#0ea5e9',
+                    subs: [
+                        { title: 'Engineering & Med', subjects: [
+                            { name: 'GATE', books: ['GATE Computer Science & IT by Arihant', 'GATE Engineering Mathematics'] },
+                            { name: 'JEE & NEET', books: ['Concepts of Physics by H.C. Verma', 'Organic Chemistry by Morrison Boyd', 'Biology NCERT Class 11 & 12'] }
+                        ] },
+                        { title: 'Civil Services', subjects: [{ name: 'UPSC', books: ['Indian Polity by M. Laxmikanth', 'History of Modern India by Bipan Chandra', 'Indian Economy by Ramesh Singh'] }] }
+                    ]
+                },
+                {
+                    title: 'Business & Finance', icon: 'fa-briefcase', color: '#f59e0b',
+                    subs: [
+                        { title: 'Management', subjects: [{ name: 'Business Strategy', books: ['Good to Great by Jim Collins', 'The Lean Startup by Eric Ries', 'Zero to One by Peter Thiel', 'The Hard Thing About Hard Things'] }] },
+                        { title: 'Investment', subjects: [{ name: 'Finance', books: ['The Intelligent Investor by Benjamin Graham', 'Rich Dad Poor Dad by Robert Kiyosaki', 'Principles by Ray Dalio', 'The Psychology of Money', 'Thinking, Fast and Slow'] }] }
+                    ]
+                },
+                {
+                    title: 'Design & UX', icon: 'fa-palette', color: '#f43f5e',
+                    subs: [
+                        { title: 'UI/UX', subjects: [{ name: 'User Experience', books: ['Don’t Make Me Think by Steve Krug', 'The Design of Everyday Things by Don Norman', 'Sprint by Jake Knapp', 'Lean UX'] }] },
+                        { title: 'Visuals', subjects: [{ name: 'Graphic Design', books: ['Thinking with Type', 'Grid Systems in Graphic Design', 'Steal Like an Artist'] }] }
+                    ]
+                },
+                {
+                    title: 'Medical', icon: 'fa-staff-snake', color: '#10b981',
+                    subs: [
+                        { title: 'Clinical', subjects: [{ name: 'Anatomy & Physio', books: ['Gray’s Anatomy', 'Harrison\'s Principles of Internal Medicine', 'Guyton and Hall Medical Physiology'] }] },
+                        { title: 'Nursing', subjects: [{ name: 'Specialties', books: ['Pediatrics Nursing', 'Brunner & Suddarth’s Nursing'] }] }
+                    ]
+                },
+                {
+                    title: 'Law & Humanity', icon: 'fa-scale-balanced', color: '#64748b',
+                    subs: [
+                        { title: 'Law', subjects: [{ name: 'Jurisprudence', books: ['Black\'s Law Dictionary', 'The Constitution of India', 'Contract Law by Pollock & Mulla'] }] },
+                        { title: 'Social Science', subjects: [{ name: 'Philosophy', books: ['Beyond Good and Evil by Nietzsche', 'The Republic by Plato', 'Meditations by Marcus Aurelius'] }] }
+                    ]
+                },
+                { 
+                    title: 'Novels', icon: 'fa-book-open', color: '#ec4899', 
+                    subs: [
+                        { title: 'Classics', subjects: [{ name: 'Literature', books: ['The Great Gatsby', '1984 by George Orwell', 'Brave New World', 'To Kill a Mockingbird'] }] },
+                        { title: 'Sci-Fi', subjects: [{ name: 'Epic Tales', books: ['Dune by Frank Herbert', 'The Hobbit', 'Project Hail Mary'] }] }
+                    ] 
+                },
+                { 
+                    title: 'Self Growth', icon: 'fa-arrow-up-trending-dots', color: '#06b6d4', 
+                    subs: [
+                        { title: 'Productivity', subjects: [{ name: 'Habits', books: ['Atomic Habits by James Clear', 'Deep Work by Cal Newport', 'Get Things Done by David Allen', 'The 5 AM Club'] }] },
+                        { title: 'Mindset', subjects: [{ name: 'Psychology', books: ['Thinking, Fast and Slow by Kahneman', 'Man\'s Search for Meaning', 'The Power of Now'] }] }
+                    ] 
+                }
+            ];
 
     const jobPortals = [
         // Top Tiers
@@ -123,21 +157,31 @@ const Resources = () => {
         'Grokking Algorithms by Aditya Bhargava': 'https://edu.anarcho-copy.org/Algorithm/grokking-algorithms-illustrated-guide-programmers-curious.pdf',
         'The Algorithm Design Manual by Steven Skiena': 'https://archive.org/download/the-algorithm-design-manual/TheAlgorithmDesignManual.pdf',
         'Cracking the Coding Interview by Gayle Laakmann McDowell': 'https://archive.org/download/cracking-the-coding-interview-6th-edition-gayle-laakmann-mcdowell/cracking-the-coding-interview-6th-edition-189-programming-questions-and-solutions.pdf',
-        
-        // Software Engineering
         'Clean Code by Robert C. Martin': 'https://archive.org/download/CleanCode/Clean_Code.pdf',
         'The Pragmatic Programmer by Andrew Hunt': 'https://archive.org/download/the-pragmatic-programmer-20th-anniversity-edition-2nd-edition-by-andrew-hunt-dav/The%20Pragmatic%20Programmer%2020th%20Anniversity%20Edition%2C%202nd%20Edition%20%28by%20Andrew%20Hunt%2C%20David%20Thomas%29.pdf',
-        
-        // Web & JS
         'Eloquent JavaScript by Marijn Haverbeke': 'https://eloquentjavascript.net/Eloquent_JavaScript.pdf',
-        'You Don\'t Know JS by Kyle Simpson': 'https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/README.md',
-        
-        // Career & Growth
+        'Thinking, Fast and Slow by Daniel Kahneman': 'https://archive.org/download/ThinkingFastAndSlow_201702/Thinking%2C%20Fast%20and%20Slow.pdf',
         'Atomic Habits by James Clear': 'https://jamesclear.com/wp-content/uploads/2018/10/Atomic-Habits-Summary.pdf',
         'Deep Work by Cal Newport': 'https://archive.org/download/deep-work-rules-for-focused-success-in-a-distracted-world-pdf-drive/Deep%20Work%20Rules%20for%20Focused%20Success%20in%20a%20Distracted%20World%20%28%20PDFDrive%20%29.pdf',
-        
-        // Specialized
-        'Site Reliability Engineering by Google': 'https://sre.google/static/pdf/sre-book-single-page.pdf'
+        'Site Reliability Engineering by Google': 'https://sre.google/static/pdf/sre-book-single-page.pdf',
+        'Don’t Make Me Think by Steve Krug': 'https://archive.org/download/dont-make-me-think-revisited-a-common-sense-approach-to-web-usability/Don%27t%20Make%20Me%20Think%2C%20Revisited%20A%20Common%20Sense%20Approach%20to%20Web%20Usability.pdf',
+        'The Design of Everyday Things by Don Norman': 'https://archive.org/download/the-design-of-everyday-things-revised-and-expanded-edition-by-don-norman/The%20Design%20of%20Everyday%20Things%2C%20Revised%20and%20Expanded%20Edition%20by%20Don%20Norman.pdf',
+        'The Intelligent Investor by Benjamin Graham': 'https://archive.org/download/the-intelligent-investor-english-benjamin-graham/The%20Intelligent%20Investor%20%28English%2C%20Benjamin%20Graham%29.pdf',
+        'Rich Dad Poor Dad by Robert Kiyosaki': 'https://archive.org/download/RichDadPoorDad_201607/Rich%20Dad%20Poor%20Dad.pdf',
+        '1984 by George Orwell': 'https://archive.org/download/GeorgeOrwell1984_201804/George%20Orwell%20-%201984.pdf',
+        'Zero to One by Peter Thiel': 'https://archive.org/download/ZeroToOneNotesOnStartupsOrHowToBuildTheFuture/Zero%20to%20One_%20Notes%20on%20Startups%2C%20or%20How%20to%20Build%20the%20Future.pdf',
+        'Clean Architecture by Robert C. Martin': 'https://archive.org/download/CleanArchitectureARaftsmansGuideToSoftwareStructureAndDesign/Clean%20Architecture_%20A%20Craftsman%27s%20Guide%20to%20Software%20Structure%20and%20Design.pdf',
+        'Beyond Good and Evil by Nietzsche': 'https://www.gutenberg.org/files/4363/4363-h/4363-h.htm',
+        'The Republic by Plato': 'https://www.gutenberg.org/cache/epub/1497/pg1497-images.html',
+        'Meditations by Marcus Aurelius': 'https://dev.gutenberg.org/cache/epub/264/pg264-images.html',
+        'The Great Gatsby': 'https://www.gutenberg.org/cache/epub/64317/pg64317-images.html',
+        'To Kill a Mockingbird': 'https://archive.org/download/ToKillAMockingbird_201904/To%20Kill%20a%20Mockingbird.pdf',
+        'Dune by Frank Herbert': 'https://archive.org/download/dune-frank-herbert_202107/Dune%20-%20Frank%20Herbert.pdf',
+        'The Hobbit': 'https://archive.org/download/the-hobbit-j.-r.-r.-tolkien/The%20Hobbit%20-%20J.R.R.%20Tolkien.pdf',
+        'Man\'s Search for Meaning': 'https://archive.org/download/mans-search-for-meaning-viktor-e.-frankl/Man%27s%20Search%20For%20Meaning%20-%20Viktor%20E.%20Frankl.pdf',
+        'The Power of Now': 'https://archive.org/download/the-power-of-now-eckhart-tolle_202102/The%20Power%20of%20Now%20-%20Eckhart%20Tolle.pdf',
+        'Indian Polity by M. Laxmikanth': 'https://archive.org/download/indian-polity-6th-edition-by-m.-laxmikanth/Indian%20Polity%206th%20Edition%20by%20M.%20Laxmikanth.pdf',
+        'Concepts of Physics by H.C. Verma': 'https://archive.org/download/conceptsofphysicsvol1h.c.verma_202003/Concepts%20of%20Physics%20Vol%201%20H.C.%20Verma.pdf'
     };
 
     // --- Action Handlers ---
