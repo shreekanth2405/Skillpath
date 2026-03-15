@@ -134,7 +134,7 @@ const Header = ({
             try {
                 const auth = JSON.parse(localStorage.getItem('auth'));
                 if (!auth) return;
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/notifications`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/notifications`, {
                     headers: { 'Authorization': `Bearer ${auth.token}` }
                 });
                 const data = await res.json();
@@ -166,7 +166,7 @@ const Header = ({
     const markAllRead = async () => {
         try {
             const auth = JSON.parse(localStorage.getItem('auth'));
-            await fetch(`${import.meta.env.VITE_API_URL}/api/v1/notifications/read-all`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/v1/notifications/read-all`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${auth.token}` }
             });
@@ -227,13 +227,8 @@ const Header = ({
                         <button
                             className={`unav-link-btn ${megamenuOpen ? 'active' : ''}`}
                             onClick={(e) => {
-                                if (window.innerWidth < 1024) {
-                                    e.preventDefault();
-                                    setMegamenuOpen(!megamenuOpen);
-                                } else {
-                                    setMegamenuOpen(false);
-                                    setActiveTab('dashboard');
-                                }
+                                e.preventDefault();
+                                setMegamenuOpen(!megamenuOpen);
                             }}
                         >
                             Solutions <ChevronDown size={13} className={megamenuOpen ? 'rotated' : ''} />
