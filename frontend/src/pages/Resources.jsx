@@ -51,15 +51,16 @@ const Resources = () => {
                 {
                     title: 'Computer Science',
                     subjects: [
-                        { name: 'Data Structures & Algorithms', books: ['DSA in Java by Robert Lafore', 'CLRS Intro to Algorithms', 'Grokking Algorithms'] },
-                        { name: 'Operating Systems', books: ['Modern Operating Systems (Tanenbaum)', 'Dinosaur Book (Galvin)'] },
-                        { name: 'Database Management', books: ['Database System Concepts (Korth)'] }
+                        { name: 'Data Structures & Algorithms', books: ['Data Structures and Algorithms in Java by Robert Lafore', 'Introduction to Algorithms by Thomas H. Cormen (CLRS)', 'Grokking Algorithms by Aditya Bhargava', 'The Algorithm Design Manual by Steven Skiena', 'Cracking the Coding Interview by Gayle Laakmann McDowell'] },
+                        { name: 'Operating Systems', books: ['Modern Operating Systems by Andrew S. Tanenbaum', 'Operating System Concepts by Abraham Silberschatz (Galvin)', 'Operating Systems: Three Easy Pieces by Remzi Arpaci-Dusseau'] },
+                        { name: 'Database Management', books: ['Database System Concepts by Silberschatz, Korth and Sudarshan', 'Database Management Systems by Raghu Ramakrishnan', 'SQL Performance Explained by Markus Winand'] },
+                        { name: 'Artificial Intelligence', books: ['Artificial Intelligence: A Modern Approach by Stuart Russell & Peter Norvig', 'Deep Learning by Ian Goodfellow', 'Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow by Aurélien Géron'] }
                     ]
                 },
-                { title: 'Mechanical', subjects: [{ name: 'Thermodynamics', books: ['Engineering Thermodynamics'] }] },
-                { title: 'Civil', subjects: [{ name: 'Structural Analysis', books: ['Mechanics of Solids'] }] },
-                { title: 'ECE', subjects: [{ name: 'Digital Electronics', books: ['Digital Design (Morris Mano)'] }] },
-                { title: 'IT', subjects: [{ name: 'Networking', books: ['Computer Networks (Tanenbaum)'] }] }
+                { title: 'Mechanical', subjects: [{ name: 'Thermodynamics', books: ['Engineering Thermodynamics by P.K. Nag', 'Fundamentals of Thermodynamics by Claus Borgnakke', 'Thermodynamics: An Engineering Approach by Yunus Çengel'] }] },
+                { title: 'Civil', subjects: [{ name: 'Structural Analysis', books: ['Structural Analysis by R.C. Hibbeler', 'Mechanics of Solids by S.S. Bhavikatti', 'Basic Civil Engineering by S.S. Bhavikatti'] }] },
+                { title: 'ECE', subjects: [{ name: 'Digital Electronics', books: ['Digital Design by M. Morris Mano', 'Principles of Electronics by V.K. Mehta', 'Microelectronic Circuits by Sedra & Smith'] }] },
+                { title: 'IT', subjects: [{ name: 'Networking', books: ['Computer Networks by Andrew S. Tanenbaum', 'Computer Networking: A Top-Down Approach by James Kurose', 'Network Programmability and Automation by Jason Edelman'] }] }
             ]
         },
         {
