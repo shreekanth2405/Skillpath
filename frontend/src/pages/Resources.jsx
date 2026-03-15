@@ -51,16 +51,22 @@ const Resources = () => {
                 {
                     title: 'Computer Science',
                     subjects: [
-                        { name: 'Data Structures & Algorithms', books: ['Data Structures and Algorithms in Java by Robert Lafore', 'Introduction to Algorithms by Thomas H. Cormen (CLRS)', 'Grokking Algorithms by Aditya Bhargava', 'The Algorithm Design Manual by Steven Skiena', 'Cracking the Coding Interview by Gayle Laakmann McDowell'] },
-                        { name: 'Operating Systems', books: ['Modern Operating Systems by Andrew S. Tanenbaum', 'Operating System Concepts by Abraham Silberschatz (Galvin)', 'Operating Systems: Three Easy Pieces by Remzi Arpaci-Dusseau'] },
-                        { name: 'Database Management', books: ['Database System Concepts by Silberschatz, Korth and Sudarshan', 'Database Management Systems by Raghu Ramakrishnan', 'SQL Performance Explained by Markus Winand'] },
-                        { name: 'Artificial Intelligence', books: ['Artificial Intelligence: A Modern Approach by Stuart Russell & Peter Norvig', 'Deep Learning by Ian Goodfellow', 'Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow by Aurélien Géron'] }
+                        { name: 'Data Structures & Algorithms', books: ['Introduction to Algorithms by Thomas H. Cormen (CLRS)', 'Grokking Algorithms by Aditya Bhargava', 'The Algorithm Design Manual by Steven Skiena', 'Cracking the Coding Interview by Gayle Laakmann McDowell'] },
+                        { name: 'Software Engineering', books: ['Clean Code by Robert C. Martin', 'The Pragmatic Programmer by Andrew Hunt', 'Refactoring by Martin Fowler', 'Design Patterns by Erich Gamma'] },
+                        { name: 'Core Basics', books: ['Eloquent JavaScript by Marijn Haverbeke', 'You Don\'t Know JS by Kyle Simpson', 'Structure and Interpretation of Computer Programs'] }
                     ]
                 },
-                { title: 'Mechanical', subjects: [{ name: 'Thermodynamics', books: ['Engineering Thermodynamics by P.K. Nag', 'Fundamentals of Thermodynamics by Claus Borgnakke', 'Thermodynamics: An Engineering Approach by Yunus Çengel'] }] },
-                { title: 'Civil', subjects: [{ name: 'Structural Analysis', books: ['Structural Analysis by R.C. Hibbeler', 'Mechanics of Solids by S.S. Bhavikatti', 'Basic Civil Engineering by S.S. Bhavikatti'] }] },
-                { title: 'ECE', subjects: [{ name: 'Digital Electronics', books: ['Digital Design by M. Morris Mano', 'Principles of Electronics by V.K. Mehta', 'Microelectronic Circuits by Sedra & Smith'] }] },
-                { title: 'IT', subjects: [{ name: 'Networking', books: ['Computer Networks by Andrew S. Tanenbaum', 'Computer Networking: A Top-Down Approach by James Kurose', 'Network Programmability and Automation by Jason Edelman'] }] }
+                {
+                    title: 'Specialized Tech',
+                    subs: [
+                        { title: 'DevOps & Cloud', subjects: [{ name: 'Infrastructure', books: ['Site Reliability Engineering by Google', 'The Phoenix Project', 'Docker Deep Dive by Nigel Poulton', 'Kubernetes Up & Running'] }] },
+                        { title: 'Web Development', books: [], subjects: [{ name: 'Frontend & Backend', books: ['Learning React by Alex Banks', 'Node.js Design Patterns', 'Fullstack React'] }] },
+                        { title: 'Artificial Intelligence', subjects: [{ name: 'Machine Learning', books: ['Deep Learning by Ian Goodfellow', 'Hands-On Machine Learning', 'Pattern Recognition and Machine Learning'] }] }
+                    ]
+                },
+                { title: 'Mechanical', subjects: [{ name: 'Thermodynamics', books: ['Engineering Thermodynamics by P.K. Nag', 'Fundamentals of Thermodynamics by Claus Borgnakke'] }] },
+                { title: 'ECE', subjects: [{ name: 'Digital Electronics', books: ['Digital Design by M. Morris Mano', 'Microelectronic Circuits by Sedra & Smith'] }] },
+                { title: 'IT', subjects: [{ name: 'Networking', books: ['Computer Networks by Andrew S. Tanenbaum', 'Computer Networking: A Top-Down Approach'] }] }
             ]
         },
         {
@@ -112,11 +118,26 @@ const Resources = () => {
     ];
 
     const pdfLinks = {
+        // Computer Science & DSA
         'Introduction to Algorithms by Thomas H. Cormen (CLRS)': 'https://web.mit.edu/6.c67/www/Textbook/Introduction_to_Algorithms_3rd_Edition.pdf',
         'Grokking Algorithms by Aditya Bhargava': 'https://edu.anarcho-copy.org/Algorithm/grokking-algorithms-illustrated-guide-programmers-curious.pdf',
-        'Atomic Habits by James Clear': 'https://jamesclear.com/wp-content/uploads/2018/10/Atomic-Habits-Summary.pdf',
         'The Algorithm Design Manual by Steven Skiena': 'https://archive.org/download/the-algorithm-design-manual/TheAlgorithmDesignManual.pdf',
-        'Cracking the Coding Interview by Gayle Laakmann McDowell': 'https://archive.org/download/cracking-the-coding-interview-6th-edition-gayle-laakmann-mcdowell/cracking-the-coding-interview-6th-edition-189-programming-questions-and-solutions.pdf'
+        'Cracking the Coding Interview by Gayle Laakmann McDowell': 'https://archive.org/download/cracking-the-coding-interview-6th-edition-gayle-laakmann-mcdowell/cracking-the-coding-interview-6th-edition-189-programming-questions-and-solutions.pdf',
+        
+        // Software Engineering
+        'Clean Code by Robert C. Martin': 'https://archive.org/download/CleanCode/Clean_Code.pdf',
+        'The Pragmatic Programmer by Andrew Hunt': 'https://archive.org/download/the-pragmatic-programmer-20th-anniversity-edition-2nd-edition-by-andrew-hunt-dav/The%20Pragmatic%20Programmer%2020th%20Anniversity%20Edition%2C%202nd%20Edition%20%28by%20Andrew%20Hunt%2C%20David%20Thomas%29.pdf',
+        
+        // Web & JS
+        'Eloquent JavaScript by Marijn Haverbeke': 'https://eloquentjavascript.net/Eloquent_JavaScript.pdf',
+        'You Don\'t Know JS by Kyle Simpson': 'https://github.com/getify/You-Dont-Know-JS/blob/1st-ed/README.md',
+        
+        // Career & Growth
+        'Atomic Habits by James Clear': 'https://jamesclear.com/wp-content/uploads/2018/10/Atomic-Habits-Summary.pdf',
+        'Deep Work by Cal Newport': 'https://archive.org/download/deep-work-rules-for-focused-success-in-a-distracted-world-pdf-drive/Deep%20Work%20Rules%20for%20Focused%20Success%20in%20a%20Distracted%20World%20%28%20PDFDrive%20%29.pdf',
+        
+        // Specialized
+        'Site Reliability Engineering by Google': 'https://sre.google/static/pdf/sre-book-single-page.pdf'
     };
 
     // --- Action Handlers ---
@@ -232,9 +253,13 @@ const Resources = () => {
                                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '2rem' }}>
                                             {subj.books.map((book, j) => (
                                                 <motion.div key={j} whileHover={{ y: -8 }} style={{ background: 'white', borderRadius: '20px', border: '1px solid #e2e8f0', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-                                                    <div style={{ height: '180px', background: 'linear-gradient(135deg, #1e293b, #334155)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', textAlign: 'center' }}>
-                                                        <span style={{ color: 'white', fontWeight: 700, fontSize: '1rem' }}>{book}</span>
-                                                    </div>
+                                                     <div style={{ height: '180px', background: 'linear-gradient(135deg, #1e293b, #334155)', borderRadius: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '1rem', textAlign: 'center', position: 'relative' }}>
+                                                         {pdfLinks[book] && (
+                                                             <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#10b981', color: 'white', fontSize: '10px', fontWeight: 900, padding: '4px 8px', borderRadius: '4px', letterSpacing: '1px' }}>LIVE PDF</div>
+                                                         )}
+                                                         <i className="fa-solid fa-book-open" style={{ color: 'rgba(255,255,255,0.2)', fontSize: '2.5rem', marginBottom: '1rem' }}></i>
+                                                         <span style={{ color: 'white', fontWeight: 700, fontSize: '1rem' }}>{book}</span>
+                                                     </div>
                                                     <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>{book}</h4>
                                                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
                                                          <button 
