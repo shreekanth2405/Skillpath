@@ -349,9 +349,9 @@ body::after {
 
 /* ── Megamenu ────────────────────────────────────── */
 @keyframes megaSlideIn {
-  0% { opacity: 0; transform: translateX(-50%) translateY(-15px) scale(0.98); }
-  60% { transform: translateX(-50%) translateY(2px) scale(1.005); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  0% { opacity: 0; transform: translateY(-15px) scale(0.98); }
+  60% { transform: translateY(2px) scale(1.005); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes megaItemFade {
@@ -363,8 +363,7 @@ body::after {
   position: absolute;
   top: calc(100% + 8px);
   /* matches bridge div height exactly */
-  left: 50%;
-  transform: translateX(-50%);
+  left: -20px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
@@ -405,25 +404,9 @@ body::after {
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: megaItemFade 0.3s ease-out forwards;
-  opacity: 0;
   background: transparent;
   border: 1px solid transparent;
 }
-
-/* Delay staggered animations for items */
-.unav-mega-col:nth-child(1) .unav-mega-item:nth-child(2) { animation-delay: 0.05s; }
-.unav-mega-col:nth-child(1) .unav-mega-item:nth-child(3) { animation-delay: 0.1s; }
-.unav-mega-col:nth-child(1) .unav-mega-item:nth-child(4) { animation-delay: 0.15s; }
-.unav-mega-col:nth-child(1) .unav-mega-item:nth-child(5) { animation-delay: 0.2s; }
-
-.unav-mega-col:nth-child(2) .unav-mega-item:nth-child(2) { animation-delay: 0.1s; }
-.unav-mega-col:nth-child(2) .unav-mega-item:nth-child(3) { animation-delay: 0.15s; }
-.unav-mega-col:nth-child(2) .unav-mega-item:nth-child(4) { animation-delay: 0.2s; }
-
-.unav-mega-col:nth-child(3) .unav-mega-item:nth-child(2) { animation-delay: 0.15s; }
-.unav-mega-col:nth-child(3) .unav-mega-item:nth-child(3) { animation-delay: 0.2s; }
-.unav-mega-col:nth-child(3) .unav-mega-item:nth-child(4) { animation-delay: 0.25s; }
 
 .unav-mega-item:hover {
   background: rgba(99, 102, 241, 0.04);
