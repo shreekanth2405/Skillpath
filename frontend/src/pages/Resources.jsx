@@ -46,87 +46,112 @@ const Resources = () => {
     // --- Data Structure ---
     const libraryData = [
                 {
-                    title: 'Computer Science', icon: 'fa-microchip', color: '#3b82f6',
+                    title: 'Computer & IT', icon: 'fa-microchip', color: '#3b82f6',
                     subs: [
-                        { name: 'Data Structures & Algorithms', books: ['Introduction to Algorithms by Thomas H. Cormen (CLRS)', 'Grokking Algorithms by Aditya Bhargava', 'The Algorithm Design Manual by Steven Skiena', 'Cracking the Coding Interview by Gayle Laakmann McDowell', 'Common-Sense Guide to Data Structures and Algorithms'] },
-                        { name: 'Software Architecture', books: ['Clean Code by Robert C. Martin', 'The Pragmatic Programmer by Andrew Hunt', 'Refactoring by Martin Fowler', 'Design Patterns by Erich Gamma', 'Clean Architecture by Robert C. Martin', 'Building Microservices by Sam Newman'] },
-                        { name: 'Programming Languages', books: ['Eloquent JavaScript by Marijn Haverbeke', 'You Don\'t Know JS by Kyle Simpson', 'Python Crash Course by Eric Matthes', 'Effective Java by Joshua Bloch', 'The C Programming Language by Kernighan & Ritchie'] }
+                        { title: 'Software Engineering', subjects: [{ name: 'Architecture', books: ['Clean Code', 'The Pragmatic Programmer', 'Design Patterns'] }] },
+                        { title: 'Data Structures', subjects: [{ name: 'Algorithms', books: ['CLRS Introduction to Algorithms', 'Grokking Algorithms'] }] },
+                        { title: 'AI & Data Science', subjects: [{ name: 'Machine Learning', books: ['Deep Learning by Goodfellow', 'Hands-on ML with Scikit-Learn'] }] },
+                        { title: 'Cloud & DevOps', subjects: [{ name: 'Infrastructure', books: ['Site Reliability Engineering', 'Terraform Up & Running'] }] },
+                        { title: 'Cybersecurity', subjects: [{ name: 'Security', books: ['The Web Application Hacker’s Handbook', 'Metasploit: The Penetration Tester\'s Guide'] }] }
                     ]
                 },
                 {
-                    title: 'Core Engineering', icon: 'fa-gears', color: '#475569',
+                    title: 'Mechanical & Robotics', icon: 'fa-robot', color: '#64748b',
                     subs: [
-                        { title: 'Mechanical', subjects: [{ name: 'Mechanics & Thermo', books: ['Engineering Mechanics by Meriam & Kraige', 'Engineering Thermodynamics by P.K. Nag', 'Heat and Mass Transfer by R.K. Rajput'] }] },
-                        { title: 'Civil', subjects: [{ name: 'Structure', books: ['Structural Analysis by R.C. Hibbeler', 'Mechanics of Solids by S.S. Bhavikatti', 'RCC Design by B.C. Punmia'] }] },
-                        { title: 'Chemical', subjects: [{ name: 'Processes', books: ['Elements of Chemical Reaction Engineering by Fogler', 'Unit Operations of Chemical Engineering by McCabe Smith'] }] },
-                        { title: 'Electrical', subjects: [{ name: 'Circuits', books: ['Electrical Technology by B.L. Theraja', 'Signals and Systems by Oppenheim'] }] }
+                        { title: 'Mechanical core', subjects: [{ name: 'Thermodynamics', books: ['Engineering Thermodynamics by P.K. Nag', 'Heat & Mass Transfer'] }] },
+                        { title: 'Robotics', subjects: [{ name: 'Automation', books: ['Introduction to Robotics by John Craig', 'Robotics: Modelling, Planning and Control'] }] },
+                        { title: 'Mechatronics', subjects: [{ name: 'Systems', books: ['Mechatronics by W. Bolton', 'Introduction to Mechatronics and Measurement Systems'] }] },
+                        { title: 'Production', subjects: [{ name: 'Manufacturing', books: ['Production Technology by R.K. Jain', 'Manufacturing Process by P.N. Rao'] }] },
+                        { title: 'Automotive', subjects: [{ name: 'Vehicle Eng', books: ['Automotive Engineering Fundamentals', 'Internal Combustion Engines by Ganesan'] }] }
                     ]
                 },
                 {
-                    title: 'Biotech & Science', icon: 'fa-dna', color: '#ec4899',
+                    title: 'Civil & Architectural', icon: 'fa-city', color: '#0ea5e9',
                     subs: [
-                        { title: 'Life Sciences', subjects: [{ name: 'Molecular', books: ['Molecular Biology of the Cell by Alberts', 'Lehninger Principles of Biochemistry', 'Genetics by Pierce'] }] },
-                        { title: 'Environment', subjects: [{ name: 'Ecology', books: ['Silent Spring by Rachel Carson', 'Environmental Science by G. Tyler Miller', 'Ecology by Odum'] }] }
+                        { title: 'Civil Core', subjects: [{ name: 'Structures', books: ['Structural Analysis by Hibbeler', 'Mechanics of Solids'] }] },
+                        { title: 'Architecture', subjects: [{ name: 'Design', books: ['The Architecture of Happiness', 'A Pattern Language'] }] },
+                        { title: 'Geotechnical', subjects: [{ name: 'Soil Mechanics', books: ['Basic and Applied Soil Mechanics', 'Geotechnical Engineering by C. Venkatramaiah'] }] },
+                        { title: 'Transportation', subjects: [{ name: 'Highways', books: ['Highway Engineering by Khanna & Justo', 'Traffic Engineering'] }] },
+                        { title: 'Water Resources', subjects: [{ name: 'Hydrology', books: ['Engineering Hydrology by K. Subramanya', 'Irrigation Engineering'] }] }
                     ]
                 },
                 {
-                    title: 'Advanced Tech', icon: 'fa-rocket', color: '#8b5cf6',
+                    title: 'Electrical & ECE', icon: 'fa-bolt', color: '#eab308',
                     subs: [
-                        { title: 'DevOps & Cloud', subjects: [{ name: 'Infrastructure', books: ['Site Reliability Engineering by Google', 'The Phoenix Project', 'Docker Deep Dive by Nigel Poulton', 'Kubernetes Up & Running', 'Terraform Up & Running'] }] },
-                        { title: 'Cybersecurity', subjects: [{ name: 'Hacking & Defense', books: ['The Web Application Hacker’s Handbook', 'Penetration Testing by Georgia Weidman', 'Social Engineering by Christopher Hadnagy', 'Practical Malware Analysis'] }] },
-                        { title: 'Data Science', subjects: [{ name: 'ML & AI', books: ['Deep Learning by Ian Goodfellow', 'Hands-On Machine Learning', 'Python for Data Analysis', 'Storytelling with Data', 'The Hundred-Page Machine Learning Book'] }] }
+                        { title: 'Electrical Core', subjects: [{ name: 'Power Systems', books: ['Electrical Technology by Theraja', 'Power System Engineering by Kothari'] }] },
+                        { title: 'Electronics', subjects: [{ name: 'VLSI & Circuits', books: ['Digital Design by Morris Mano', 'Microelectronic Circuits by Sedra Smith'] }] },
+                        { title: 'Telecom', subjects: [{ name: 'Communications', books: ['Communication Systems by Simon Haykin', 'Wireless Communications'] }] },
+                        { title: 'Control Systems', subjects: [{ name: 'Automation', books: ['Control Systems Engineering by Norman Nise', 'Modern Control Engineering'] }] },
+                        { title: 'Signals', subjects: [{ name: 'DSP', books: ['Digital Signal Processing by Proakis', 'Signals and Systems by Oppenheim'] }] }
+                    ]
+                },
+                {
+                    title: 'Aerospace & Defense', icon: 'fa-plane-departure', color: '#6366f1',
+                    subs: [
+                        { title: 'Aerospace Core', subjects: [{ name: 'Aeronautics', books: ['Introduction to Flight by John Anderson', 'Fundamentals of Aerodynamics'] }] },
+                        { title: 'Propulsion', subjects: [{ name: 'Jet Engines', books: ['Elements of Propulsion', 'Gas Turbine Theory'] }] },
+                        { title: 'Avionics', subjects: [{ name: 'Flight Tech', books: ['Avionics Systems', 'Digital Avionics Systems'] }] },
+                        { title: 'Satellite Eng', subjects: [{ name: 'Spacecraft', books: ['Orbital Mechanics for Engineering Students', 'Space Mission Engineering'] }] },
+                        { title: 'Renewable Energy', subjects: [{ name: 'Green Tech', books: ['Renewable Energy Engineering', 'Solar Engineering of Thermal Processes'] }] }
+                    ]
+                },
+                {
+                    title: 'Chemical & Materials', icon: 'fa-flask', color: '#10b981',
+                    subs: [
+                        { title: 'Chemical Core', subjects: [{ name: 'Process Eng', books: ['McCabe Smith Unit Operations', 'Chemical Reaction Engineering'] }] },
+                        { title: 'Materials Science', subjects: [{ name: 'Crystallography', books: ['Callister’s Materials Science', 'Materials Science and Engineering'] }] },
+                        { title: 'Petroleum', subjects: [{ name: 'Oil & Gas', books: ['Applied Petroleum Reservoir Engineering', 'Drilling Engineering'] }] },
+                        { title: 'Metallurgy', subjects: [{ name: 'Metals', books: ['Physical Metallurgy Principles', 'Extraction of Nonferrous Metals'] }] },
+                        { title: 'Nanotechnology', subjects: [{ name: 'Nano Eng', books: ['Introduction to Nanotechnology', 'Nanomaterials'] }] }
+                    ]
+                },
+                {
+                    title: 'Bio & Environmental', icon: 'fa-leaf', color: '#22c55e',
+                    subs: [
+                        { title: 'Biomedical', subjects: [{ name: 'Medical Devices', books: ['Biomedical Instrumentation', 'Principles of Anatomy and Physiology'] }] },
+                        { title: 'Biotech Eng', subjects: [{ name: 'Gene Eng', books: ['Bioprocess Engineering Principles', 'Molecular Biotechnology'] }] },
+                        { title: 'Environmental', subjects: [{ name: 'Sustainability', books: ['Environmental Engineering by Metcalf & Eddy', 'Waste Water Engineering'] }] },
+                        { title: 'Agricultural', subjects: [{ name: 'Farm Tech', books: ['Elements of Agricultural Engineering', 'Principles of Farm Machinery'] }] },
+                        { title: 'Marine Eng', subjects: [{ name: 'Ocean Systems', books: ['Introduction to Marine Engineering', 'Ship Knowledge'] }] }
+                    ]
+                },
+                {
+                    title: 'Specialized & Future', icon: 'fa-atom', color: '#f43f5e',
+                    subs: [
+                        { title: 'Nuclear Eng', subjects: [{ name: 'Radiation', books: ['Introduction to Nuclear Engineering', 'Nuclear Reactor Analysis'] }] },
+                        { title: 'Textile Eng', subjects: [{ name: 'Fabrics', books: ['Textile Mathematics', 'Principles of Textile Testing'] }] },
+                        { title: 'Mining Eng', subjects: [{ name: 'Extraction', books: ['Introductory Mining Engineering', 'Rock Mechanics'] }] },
+                        { title: 'Systems Eng', subjects: [{ name: 'Optimization', books: ['Systems Engineering and Analysis', 'Operations Research'] }] },
+                        { title: 'Industrial Eng', subjects: [{ name: 'Management', books: ['Industrial Engineering and Management by O.P. Khanna', 'Work Study'] }] }
                     ]
                 },
                 {
                     title: 'Exams & Competitive', icon: 'fa-graduation-cap', color: '#0ea5e9',
                     subs: [
-                        { title: 'Engineering & Med', subjects: [
-                            { name: 'GATE', books: ['GATE Computer Science & IT by Arihant', 'GATE Engineering Mathematics'] },
-                            { name: 'JEE & NEET', books: ['Concepts of Physics by H.C. Verma', 'Organic Chemistry by Morrison Boyd', 'Biology NCERT Class 11 & 12'] }
-                        ] },
-                        { title: 'Civil Services', subjects: [{ name: 'UPSC', books: ['Indian Polity by M. Laxmikanth', 'History of Modern India by Bipan Chandra', 'Indian Economy by Ramesh Singh'] }] }
+                        { title: 'Engineering GATE', subjects: [{ name: 'CS & IT', books: ['GATE Computer Science by Arihant', 'GATE Engineering Mathematics'] }] },
+                        { title: 'JEE & NEET', subjects: [{ name: 'Advanced Prep', books: ['Concepts of Physics by H.C. Verma', 'Organic Chemistry by Morrison Boyd', 'Biology NCERT'] }] },
+                        { title: 'Civil Services', subjects: [{ name: 'UPSC', books: ['Indian Polity by M. Laxmikanth', 'History of Modern India'] }] }
                     ]
                 },
                 {
-                    title: 'Commerce & Finance', icon: 'fa-chart-pie', color: '#10b981',
+                    title: 'Commerce & Business', icon: 'fa-chart-pie', color: '#10b981',
                     subs: [
-                        { title: 'Economics', subjects: [{ name: 'Macro/Micro', books: ['Principles of Economics by N. Gregory Mankiw', 'Wealth of Nations by Adam Smith', 'Capital in the Twenty-First Century'] }] },
-                        { title: 'Business', subjects: [{ name: 'Enterprise', books: ['Financial Accounting by Weygandt', 'Marketing Management by Philip Kotler', 'The Lean Startup', 'Good to Great'] }] }
+                        { title: 'Economics', subjects: [{ name: 'Global Finance', books: ['Principles of Economics by Mankiw', 'Wealth of Nations'] }] },
+                        { title: 'Business', subjects: [{ name: 'Management', books: ['Marketing Management by Kotler', 'The Lean Startup'] }] }
                     ]
                 },
                 {
-                    title: 'Design & UX', icon: 'fa-palette', color: '#f43f5e',
+                    title: 'Medical & Clinial', icon: 'fa-staff-snake', color: '#f43f5e',
                     subs: [
-                        { title: 'UI/UX', subjects: [{ name: 'User Experience', books: ['Don’t Make Me Think by Steve Krug', 'The Design of Everyday Things by Don Norman', 'Sprint by Jake Knapp', 'Lean UX'] }] },
-                        { title: 'Visuals', subjects: [{ name: 'Graphic Design', books: ['Thinking with Type', 'Grid Systems in Graphic Design', 'Steal Like an Artist'] }] }
-                    ]
-                },
-                {
-                    title: 'Medical', icon: 'fa-staff-snake', color: '#ef4444',
-                    subs: [
-                        { title: 'Clinical', subjects: [{ name: 'Anatomy & Physio', books: ['Gray’s Anatomy', 'Harrison\'s Principles of Internal Medicine', 'Guyton and Hall Medical Physiology'] }] },
-                        { title: 'Specialties', subjects: [{ name: 'Pharmacology', books: ['Katzung Basic & Clinical Pharmacology', 'Goodman & Gilman\'s Pharmacology'] }] }
-                    ]
-                },
-                {
-                    title: 'Law & Humanity', icon: 'fa-scale-balanced', color: '#64748b',
-                    subs: [
-                        { title: 'Law', subjects: [{ name: 'Jurisprudence', books: ['Black\'s Law Dictionary', 'The Constitution of India', 'Contract Law by Pollock & Mulla'] }] },
-                        { title: 'Social Science', subjects: [{ name: 'History & Philo', books: ['Sapiens: A Brief History of Humankind', 'The Republic by Plato', 'Beyond Good and Evil by Nietzsche', 'Meditations by Marcus Aurelius', 'Nicomachean Ethics by Aristotle'] }] }
+                        { title: 'Core Medicine', subjects: [{ name: 'Anatomy', books: ['Gray’s Anatomy', 'Harrison\'s Internal Medicine'] }] },
+                        { title: 'Pharmacology', subjects: [{ name: 'Drugs', books: ['Katzung Pharmacology', 'Goodman & Gilman'] }] }
                     ]
                 },
                 { 
-                    title: 'Novels', icon: 'fa-book-open', color: '#ec4899', 
+                    title: 'Novels & Growth', icon: 'fa-book-open', color: '#ec4899', 
                     subs: [
-                        { title: 'Classics', subjects: [{ name: 'Literature', books: ['The Great Gatsby', '1984 by George Orwell', 'Brave New World', 'To Kill a Mockingbird'] }] },
-                        { title: 'Sci-Fi', subjects: [{ name: 'Epic Tales', books: ['Dune by Frank Herbert', 'The Hobbit', 'Project Hail Mary'] }] }
-                    ] 
-                },
-                { 
-                    title: 'Self Growth', icon: 'fa-arrow-up-trending-dots', color: '#06b6d4', 
-                    subs: [
-                        { title: 'Productivity', subjects: [{ name: 'Habits', books: ['Atomic Habits by James Clear', 'Deep Work by Cal Newport', 'Get Things Done by David Allen', 'The 5 AM Club'] }] },
-                        { title: 'Mindset', subjects: [{ name: 'Psychology', books: ['Thinking, Fast and Slow by Kahneman', 'Man\'s Search for Meaning', 'The Power of Now', 'Influence by Robert Cialdini', 'Predictably Irrational'] }] }
+                        { title: 'Classics', subjects: [{ name: 'Literature', books: ['1984 by George Orwell', 'The Great Gatsby'] }] },
+                        { title: 'Self Growth', subjects: [{ name: 'Mindset', books: ['Atomic Habits', 'Thinking, Fast and Slow'] }] }
                     ] 
                 }
             ];
@@ -206,7 +231,12 @@ const Resources = () => {
         'Sapiens: A Brief History of Humankind': 'https://archive.org/download/2011YuvalNoahHarariSapiensABriefHistoryOfHumankind/2011%20Yuval%20Noah%20Harari%20-%20Sapiens%20A%20Brief%20History%20Of%20Humankind.pdf',
         'Contract Law by Pollock & Mulla': 'https://archive.org/download/pollockmullaonth00polluoft/pollockmullaonth00polluoft.pdf',
         'Engineering Mechanics by Meriam & Kraige': 'https://archive.org/download/engineering-mechanics-dynamics-by-j.-l.-meriam-l.-g.-kraige-6th-edition/Engineering%20Mechanics%20Dynamics%20By%20J.%20L.%20Meriam%2C%20L.%20G.%20Kraige%206th%20Edition.pdf',
-        'Nicomachean Ethics by Aristotle': 'https://www.gutenberg.org/files/4300/4300-h/4300-h.htm'
+        'Nicomachean Ethics by Aristotle': 'https://www.gutenberg.org/files/4300/4300-h/4300-h.htm',
+        'Engineering Thermodynamics by P.K. Nag': 'https://archive.org/download/engineering-thermodynamics-p.-k.-nag/Engineering%20Thermodynamics%20-%20P.%20K.%20Nag.pdf',
+        'Structural Analysis by Hibbeler': 'https://archive.org/download/structural-analysis-8th-edition-r.-c.-hibbeler/Structural%20Analysis%208th%20Edition%20R.%20C.%20Hibbeler.pdf',
+        'Introduction to Robotics by John Craig': 'https://archive.org/download/introduction-to-robotics-mechanics-and-control-3rd-edition/Introduction%20to%20Robotics%20Mechanics%20and%20Control%203rd%20Edition.pdf',
+        'Signals and Systems by Oppenheim': 'https://archive.org/download/AlanV.OppenheimAlanS.WillskyWithS.HamidSignalsAndSystemsPrenticeHall1996/Alan%20V.%20Oppenheim%2C%20Alan%20S.%20Willsky%20with%20S.%20Hamid%20-%20Signals%20and%20Systems-Prentice%20Hall%20%281996%29.pdf',
+        'Industrial Engineering and Management by O.P. Khanna': 'https://archive.org/download/industrial-engineering-and-management-by-o.-p.-khanna/Industrial%20Engineering%20and%20Management%20by%20O.%20P.%20Khanna.pdf'
     };
 
     // --- Action Handlers ---
