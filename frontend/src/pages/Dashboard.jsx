@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import FullReportGenerator from '../components/FullReportGenerator';
 
 // ─── Recharts Imports ───
 import {
@@ -71,6 +72,8 @@ const Dashboard = ({ setActiveTab, userXP, userLevel, userCoins, user }) => {
                     </div>
                 </div>
             </motion.div>
+
+            <FullReportGenerator />
 
             <motion.div variants={containerVariants} initial="hidden" animate="visible" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
