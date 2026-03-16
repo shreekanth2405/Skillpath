@@ -15,20 +15,28 @@ const Sidebar = ({ activeTab, setActiveTab, isUploading, handleFileUpload, knowl
     const solutionsMenu = {
         'Learning & Career': [
             { id: 'dashboard', label: 'Main Dashboard', icon: 'fa-house', desc: 'Central command & overview' },
+            { id: 'careeradvisor', label: 'AI Career Advisor', icon: 'fa-wand-magic-sparkles', desc: 'Analyse by Notify by AI' },
             { id: 'learning', label: 'Learning Hub', icon: 'fa-book-open', desc: '1000+ courses & tutorials' },
             { id: 'career', label: 'Career Hub', icon: 'fa-briefcase', desc: 'Resumes, trackers, roadmaps' },
             { id: 'skillpaths', label: 'AI Skill Path Editor', icon: 'fa-road', desc: 'Generate custom curricula' },
+            { id: 'resources', label: 'Resources Hub', icon: 'fa-box-archive', desc: 'Digital library & files' },
         ],
         'Communication & Growth': [
             { id: 'communicationhub', label: 'Communication Hub', icon: 'fa-comments', desc: 'Speaking & Language' },
             { id: 'habittracker', label: 'Habit Tracker', icon: 'fa-fire', desc: 'Daily consistency monitor' },
             { id: 'eventhub', label: 'Global Event Hub', icon: 'fa-calendar-star', desc: 'Join global events' },
+        ],
+        'Mentorship & Expert Help': [
+            { id: 'mentorship?cat=academic', label: 'Academic & Coding', icon: 'fa-user-graduate', desc: 'DSA, Software, All Departments' },
+            { id: 'mentorship?cat=gov_exams', label: 'Government Exams', icon: 'fa-building-columns', desc: 'RRB, TET, GST, SSC & UPSC' },
+            { id: 'mentorship?cat=job_prep', label: 'Job & Career', icon: 'fa-briefcase', desc: 'Mock Interviews & Professional Prep' },
+            { id: 'mentorship?cat=entrance', label: 'Entrance Exams', icon: 'fa-pen-to-square', desc: 'JEE, NEET, GATE & More' },
         ]
     };
 
     const mainLinks = [
         { id: 'communityhub', label: 'Community' },
-        { id: 'resources', label: 'Resources' },
+        { id: 'mentorship', label: 'Mentorship & Mentor' },
         { id: 'games', label: 'Games' },
         { id: 'chatbot', label: 'AI Chatbot', isSpecial: true },
         { id: 'contact', label: 'Contact' }

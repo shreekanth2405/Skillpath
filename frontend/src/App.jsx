@@ -59,6 +59,8 @@ import SolarSystem from './pages/SolarSystem';
 import UrbanWarzone from './pages/UrbanWarzone';
 import Labs from './pages/Labs';
 import LabRoom from './pages/LabRoom';
+import MentorshipHub from './pages/MentorshipHub';
+import AICareerAdvisor from './pages/AICareerAdvisor';
 
 function MainApp() {
   const navigate = useNavigate();
@@ -305,6 +307,8 @@ function MainApp() {
       <Route path="/events" element={<ProtectedLayout><EventHub /></ProtectedLayout>} />
       <Route path="/ai-confidence" element={<ProtectedLayout><AiConfidenceScore /></ProtectedLayout>} />
       <Route path="/practical" element={<ProtectedLayout><PracticalHub /></ProtectedLayout>} />
+      <Route path="/mentorship" element={<ProtectedLayout><MentorshipHub /></ProtectedLayout>} />
+      <Route path="/careeradvisor" element={<ProtectedLayout><AICareerAdvisor /></ProtectedLayout>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
