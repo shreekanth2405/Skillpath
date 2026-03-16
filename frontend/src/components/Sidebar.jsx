@@ -31,6 +31,10 @@ const Sidebar = ({ activeTab, setActiveTab, isUploading, handleFileUpload, knowl
             { id: 'mentorship?cat=gov_exams', label: 'Government Exams', icon: 'fa-building-columns', desc: 'RRB, TET, GST, SSC & UPSC' },
             { id: 'mentorship?cat=job_prep', label: 'Job & Career', icon: 'fa-briefcase', desc: 'Mock Interviews & Professional Prep' },
             { id: 'mentorship?cat=entrance', label: 'Entrance Exams', icon: 'fa-pen-to-square', desc: 'JEE, NEET, GATE & More' },
+        ],
+        'Future & Events': [
+            { id: 'events', label: 'Upcoming Events Calendar', icon: 'fa-calendar-days', desc: 'Global exams, conferences & fairs' },
+            { id: 'futureprediction', label: 'Future Prediction AI', icon: 'fa-crystal-ball', desc: 'Market demand & career simulation' },
         ]
     };
 

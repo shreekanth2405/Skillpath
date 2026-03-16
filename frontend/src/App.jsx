@@ -61,6 +61,7 @@ import Labs from './pages/Labs';
 import LabRoom from './pages/LabRoom';
 import MentorshipHub from './pages/MentorshipHub';
 import AICareerAdvisor from './pages/AICareerAdvisor';
+import FuturePredictionAI from './pages/FuturePredictionAI';
 
 function MainApp() {
   const navigate = useNavigate();
@@ -309,6 +310,7 @@ function MainApp() {
       <Route path="/practical" element={<ProtectedLayout><PracticalHub /></ProtectedLayout>} />
       <Route path="/mentorship" element={<ProtectedLayout><MentorshipHub /></ProtectedLayout>} />
       <Route path="/careeradvisor" element={<ProtectedLayout><AICareerAdvisor /></ProtectedLayout>} />
+      <Route path="/futureprediction" element={<ProtectedLayout><FuturePredictionAI /></ProtectedLayout>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
