@@ -32,7 +32,8 @@ const CertificationHub = ({ setActiveTab }) => {
     useEffect(() => {
         const fetchCertifications = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const auth = JSON.parse(localStorage.getItem('auth'));
+                const token = auth?.token;
                 const res = await axios.get(`${import.meta.env.VITE_API_URL}/v1/certifications`, {
                     headers: {
                         Authorization: `Bearer ${token}`

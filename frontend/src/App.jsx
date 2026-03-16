@@ -307,10 +307,10 @@ function MainApp() {
       <Route path="/market-vulnerability" element={<ProtectedLayout><MarketVulnerability /></ProtectedLayout>} />
       <Route path="/events" element={<ProtectedLayout><EventHub /></ProtectedLayout>} />
       <Route path="/ai-confidence" element={<ProtectedLayout><AiConfidenceScore /></ProtectedLayout>} />
-      <Route path="/practical" element={<ProtectedLayout><PracticalHub /></ProtectedLayout>} />
       <Route path="/mentorship" element={<ProtectedLayout><MentorshipHub /></ProtectedLayout>} />
       <Route path="/careeradvisor" element={<ProtectedLayout><AICareerAdvisor /></ProtectedLayout>} />
       <Route path="/futureprediction" element={<ProtectedLayout><FuturePredictionAI /></ProtectedLayout>} />
+      <Route path="/certificationhub" element={<ProtectedLayout><CertificationHub setActiveTab={setActiveTab} /></ProtectedLayout>} />
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

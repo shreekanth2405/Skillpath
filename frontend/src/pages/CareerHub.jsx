@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 
 const CareerHub = ({ setActiveTab }) => {
     const modules = [
-        { id: 'careerroadmap', title: 'Roadmap Page', desc: 'View your AI-generated career roadmap.', icon: 'fa-route', color: '#8b5cf6' },
-        { id: 'careergenie', title: 'Career Genie', desc: 'Discover your ideal department path.', icon: 'fa-wand-magic-sparkles', color: '#f59e0b' },
-        { id: 'resume', title: 'Resume & ATS Tools', desc: 'Build and analyze your ATS resume.', icon: 'fa-file-invoice', color: '#ef4444' },
-        { id: 'jobtracker', title: 'AI Job Tracker', desc: 'Track jobs perfectly matching your profile.', icon: 'fa-map-location-dot', color: '#3b82f6' },
+        { id: 'career/roadmap', title: 'Roadmap Page', desc: 'View your AI-generated career roadmap.', icon: 'fa-route', color: '#8b5cf6' },
+        { id: 'career/genie', title: 'Career Genie', desc: 'Discover your ideal department path.', icon: 'fa-wand-magic-sparkles', color: '#f59e0b' },
+        { id: 'career/resume', title: 'Resume & ATS Tools', desc: 'Build and analyze your ATS resume.', icon: 'fa-file-invoice', color: '#ef4444' },
+        { id: 'career/jobs', title: 'AI Job Tracker', desc: 'Track jobs perfectly matching your profile.', icon: 'fa-map-location-dot', color: '#3b82f6' },
         { id: 'resources?tab=career', title: 'Global Job Portals', desc: 'Direct access to 20+ major job boards.', icon: 'fa-globe', color: '#0ea5e9' },
         { id: 'practical', title: 'Domain Solutions Hub', desc: 'Polish your practical skills for technical interviews.', icon: 'fa-flask-vial', color: '#10b981' },
     ];

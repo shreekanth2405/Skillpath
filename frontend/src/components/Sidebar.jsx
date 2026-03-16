@@ -17,6 +17,7 @@ const Sidebar = ({ activeTab, setActiveTab, isUploading, handleFileUpload, knowl
             { id: 'dashboard', label: 'Main Dashboard', icon: 'fa-house', desc: 'Central command & overview' },
             { id: 'careeradvisor', label: 'AI Career Advisor', icon: 'fa-wand-magic-sparkles', desc: 'Analyse by Notify by AI' },
             { id: 'learning', label: 'Learning Hub', icon: 'fa-book-open', desc: '1000+ courses & tutorials' },
+            { id: 'certificationhub', label: 'Certification Hub', icon: 'fa-graduation-cap', desc: 'Global professional certifications' },
             { id: 'career', label: 'Career Hub', icon: 'fa-briefcase', desc: 'Resumes, trackers, roadmaps' },
             { id: 'skillpaths', label: 'AI Skill Path Editor', icon: 'fa-road', desc: 'Generate custom curricula' },
             { id: 'resources', label: 'Resources Hub', icon: 'fa-box-archive', desc: 'Digital library & files' },

@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 
 const LearningHub = ({ setActiveTab }) => {
     const modules = [
-        { id: 'codereviewer', title: 'IDE Practice & AI Mentor', desc: 'Full LeetCode-style platform with AI code review and problem generation.', icon: 'fa-code', color: '#6366f1' },
+        { id: 'learning/reviews', title: 'IDE Practice & AI Mentor', desc: 'Full LeetCode-style platform with AI code review and problem generation.', icon: 'fa-code', color: '#6366f1' },
         { id: 'practical', title: 'Practical Solutions Hub', desc: 'Master 20+ tech domains through 500+ interactive hands-on labs.', icon: 'fa-flask-vial', color: '#10b981' },
-        { id: 'elearning', title: 'E-Learning Section', desc: 'Access 1000+ interactive courses.', icon: 'fa-youtube', color: '#ef4444' },
+        { id: 'learning/sessions', title: 'E-Learning Section', desc: 'Access 1000+ interactive courses.', icon: 'fa-youtube', color: '#ef4444' },
         { id: 'certificationhub', title: 'Certification Hub', desc: 'Find and apply for top certifications.', icon: 'fa-graduation-cap', color: '#8b5cf6' },
         { id: 'resources?tab=career', title: 'Global Job Solutions', desc: 'Access 20+ job portals and AI career insights.', icon: 'fa-briefcase', color: '#3b82f6' },
     ];
