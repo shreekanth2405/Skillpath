@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const CareerHub = ({ setActiveTab }) => {
     const modules = [
         { id: 'career/roadmap', title: 'Roadmap Page', desc: 'View your AI-generated career roadmap.', icon: 'fa-route', color: '#8b5cf6' },
-        { id: 'career/genie', title: 'Career Genie', desc: 'Discover your ideal department path.', icon: 'fa-wand-magic-sparkles', color: '#f59e0b' },
+        { id: 'career/genie', title: 'Career Genie', desc: 'Discover your ideal domain path.', icon: 'fa-wand-magic-sparkles', color: '#f59e0b' },
         { id: 'career/resume', title: 'Resume & ATS Tools', desc: 'Build and analyze your ATS resume.', icon: 'fa-file-invoice', color: '#ef4444' },
         { id: 'career/jobs', title: 'AI Job Tracker', desc: 'Track jobs perfectly matching your profile.', icon: 'fa-map-location-dot', color: '#3b82f6' },
         { id: 'career/fit-analyzer', title: 'AI Job Fit Analyzer', icon: 'fa-microchip', color: '#6366f1', desc: 'Analyze skill gap & readiness' },
