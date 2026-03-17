@@ -11,6 +11,7 @@ console.log("⏰ SKILLPATH NOTIFICATION & SCHEDULER ENGINE ⏰");
 console.log("==================================================");
 
 // Connects to DB directly
+// Connects to DB directly
 async function analyzeAndNotify() {
     try {
         console.log(`[${new Date().toISOString()}] Analyzing upcoming schedules and user registrations...`);

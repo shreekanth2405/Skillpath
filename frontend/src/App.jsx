@@ -41,7 +41,6 @@ import CodeReviewer from './pages/CodeReviewer';
 import CommunityHub from './pages/CommunityHub';
 import PracticalHub from './pages/PracticalHub';
 import TrendingSection from './pages/TrendingSection';
-import AiRecommendations from './pages/AiRecommendations';
 import TrendingSkills from './pages/TrendingSkills';
 import CareerAlerts from './pages/CareerAlerts';
 import SalaryInsights from './pages/SalaryInsights';
@@ -62,6 +61,10 @@ import LabRoom from './pages/LabRoom';
 import MentorshipHub from './pages/MentorshipHub';
 import AICareerAdvisor from './pages/AICareerAdvisor';
 import FuturePredictionAI from './pages/FuturePredictionAI';
+import JobFitAnalyzer from './pages/JobFitAnalyzer';
+import Project2HireHub from './pages/Project2HireHub';
+import ProjectEngine from './pages/ProjectEngine';
+import AIResumeAnalyzer from './pages/AIResumeAnalyzer';
 
 function MainApp() {
   const navigate = useNavigate();
@@ -292,6 +295,12 @@ function MainApp() {
       <Route path="/career/genie" element={<ProtectedLayout><CareerGenie /></ProtectedLayout>} />
       <Route path="/career/alerts" element={<ProtectedLayout><CareerAlerts /></ProtectedLayout>} />
       <Route path="/career/salary" element={<ProtectedLayout><SalaryInsights /></ProtectedLayout>} />
+      <Route path="/career/fit-analyzer" element={<ProtectedLayout><JobFitAnalyzer setActiveTab={setActiveTab} /></ProtectedLayout>} />
+      
+      {/* Project2Hire Routes */}
+      <Route path="/p2h" element={<ProtectedLayout><Project2HireHub setActiveTab={setActiveTab} /></ProtectedLayout>} />
+      <Route path="/p2h/projects" element={<ProtectedLayout><ProjectEngine /></ProtectedLayout>} />
+      <Route path="/career/resume-analyzer" element={<ProtectedLayout><AIResumeAnalyzer /></ProtectedLayout>} />
 
       <Route path="/communication/english" element={<ProtectedLayout><EnglishLearning /></ProtectedLayout>} />
       <Route path="/communication/assistant" element={<ProtectedLayout><CommunicationAssistant /></ProtectedLayout>} />

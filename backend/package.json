@@ -8,6 +8,7 @@
         "dev": "nodemon server.js"
     },
     "dependencies": {
+        "@google/generative-ai": "^0.24.1",
         "@prisma/adapter-pg": "^7.4.2",
         "@prisma/client": "^7.4.1",
         "@sendgrid/mail": "^8.1.6",

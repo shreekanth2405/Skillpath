@@ -7,8 +7,11 @@ const CareerHub = ({ setActiveTab }) => {
         { id: 'career/genie', title: 'Career Genie', desc: 'Discover your ideal department path.', icon: 'fa-wand-magic-sparkles', color: '#f59e0b' },
         { id: 'career/resume', title: 'Resume & ATS Tools', desc: 'Build and analyze your ATS resume.', icon: 'fa-file-invoice', color: '#ef4444' },
         { id: 'career/jobs', title: 'AI Job Tracker', desc: 'Track jobs perfectly matching your profile.', icon: 'fa-map-location-dot', color: '#3b82f6' },
-        { id: 'resources?tab=career', title: 'Global Job Portals', desc: 'Direct access to 20+ major job boards.', icon: 'fa-globe', color: '#0ea5e9' },
-        { id: 'practical', title: 'Domain Solutions Hub', desc: 'Polish your practical skills for technical interviews.', icon: 'fa-flask-vial', color: '#10b981' },
+        { id: 'career/fit-analyzer', title: 'AI Job Fit Analyzer', icon: 'fa-microchip', color: '#6366f1', desc: 'Analyze skill gap & readiness' },
+        { id: 'career/resume-analyzer', title: 'AI Resume Analyzer', icon: 'fa-file-magnifying-glass', color: '#ef4444', desc: 'ATS Score & Keyword Optimizer' },
+        { id: 'p2h', title: 'Project2Hire AI', icon: 'fa-rocket', color: '#3b82f6', desc: 'Project-based learning & automation' },
+        { id: 'resources?tab=career', title: 'Global Job Portals', icon: 'fa-globe', color: '#10b981', desc: 'Connect with 20+ job boards' },
+        { id: 'practical', title: 'Domain Solutions Hub', desc: 'Polish your practical skills for technical interviews.', icon: 'fa-flask-vial', color: '#0ea5e9' },
     ];
 
     return (

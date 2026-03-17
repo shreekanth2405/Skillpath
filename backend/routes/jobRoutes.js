@@ -30,4 +30,8 @@ router.route('/analysis/skill-gaps')
 router.route('/scan')
     .post(protect, predictAndScan);
 
+// Route: /api/v1/jobs/growth-prediction
+router.route('/growth-prediction')
+    .get(protect, (req, res) => res.status(200).json({ success: true, data: "Your growth looks promising in AI Engineering." })); // Mock for now
+
 module.exports = router;

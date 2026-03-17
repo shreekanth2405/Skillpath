@@ -80,6 +80,7 @@ app.use('/api/v1/certifications', require('./routes/certificationRoutes'));
 app.use('/api/v1/labs', require('./routes/labRoutes'));
 app.use('/api/v1/notifications', require('./routes/notificationRoutes'));
 app.use('/api/v1/community', require('./routes/communityRoutes'));
+app.use('/api/v1/projects', require('./routes/projectRoutes'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {

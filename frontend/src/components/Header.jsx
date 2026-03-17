@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Header = ({
     setActiveTab,
@@ -101,43 +102,32 @@ const Header = ({
 
     // ─── Navigation Data ─────────────────────────────────────────────────
     const solutionsMenu = {
-        'Learning & Career': [
-            { id: 'dashboard', label: 'Main Dashboard', icon: 'fa-house', desc: 'Central command & overview' },
-            { id: 'careeradvisor', label: 'AI Career Advisor', icon: 'fa-wand-magic-sparkles', desc: 'Analyse by Notify by AI' },
-            { id: 'learning', label: 'Learning Hub', icon: 'fa-book-open', desc: '1000+ courses & tutorials' },
-            { id: 'certificationhub', label: 'Certification Hub', icon: 'fa-graduation-cap', desc: 'Global professional certifications' },
-            { id: 'career', label: 'Career Hub', icon: 'fa-briefcase', desc: 'Resumes, trackers, roadmaps' },
-            { id: 'practical', label: 'Practical Hub', icon: 'fa-flask-vial', desc: '500+ hands-on labs' },
-            { id: 'resources', label: 'Resources Hub', icon: 'fa-box-archive', desc: 'Digital library & files' },
+        'Academy & Labs': [
+            { id: 'dashboard', label: 'Analytics Dashboard', icon: 'fa-chart-pie', desc: 'Performance & XP overview' },
+            { id: 'learning', label: 'Infinite Learning Hub', icon: 'fa-book-open', desc: '1000+ AI-curated courses' },
+            { id: 'learning/labs', label: 'Skill Labs', icon: 'fa-flask-vial', desc: '500+ hands-on simulators' },
+            { id: 'certificationhub', label: 'Certification Pro', icon: 'fa-award', desc: 'Global professional standards' },
         ],
-        'Job Search & Portals': [
-            { id: 'resources?tab=career', label: 'Global Job Portals', icon: 'fa-globe', desc: 'LinkedIn, Naukri, & 20+ more' },
-            { id: 'resources?tab=career', label: 'Tech Job Boards', icon: 'fa-code-branch', desc: 'Hired, Dice, StackOverflow' },
-            { id: 'resources?tab=career', label: 'Remote Roles', icon: 'fa-laptop-house', desc: 'Remote.co, WeWorkRemotely' },
+        'Career Strategy': [
+            { id: 'career/fit-analyzer', label: 'Job-Fit Analyzer', icon: 'fa-crosshairs', desc: 'Skill-gap & readiness score' },
+            { id: 'career', label: 'Professional Profile', icon: 'fa-id-card', desc: 'Resume, Portfolios & Jobs' },
+            { id: 'p2h', label: 'Project2Hire AI', icon: 'fa-robot', desc: 'Build & Automate Hiring' },
         ],
-        'Communication & Growth': [
-            { id: 'communicationhub', label: 'Communication Hub', icon: 'fa-comments', desc: 'Speaking & Language' },
-            { id: 'habittracker', label: 'Habit Tracker', icon: 'fa-fire', desc: 'Daily consistency monitor' },
-            { id: 'events', label: 'Global Event Hub', icon: 'fa-calendar-star', desc: 'Join global events' },
-        ],
-        'Mentorship & Expert Help': [
-            { id: 'mentorship?cat=academic', label: 'Academic & Coding', icon: 'fa-user-graduate', desc: 'DSA, Software, All Departments' },
-            { id: 'mentorship?cat=gov_exams', label: 'Government Exams', icon: 'fa-building-columns', desc: 'RRB, TET, GST, SSC & UPSC' },
-            { id: 'mentorship?cat=job_prep', label: 'Job & Career', icon: 'fa-briefcase', desc: 'Mock Interviews & Professional Prep' },
-            { id: 'mentorship?cat=entrance', label: 'Entrance Exams', icon: 'fa-pen-to-square', desc: 'JEE, NEET, GATE & More' },
-        ],
-        'Future & Events': [
-            { id: 'events', label: 'Upcoming Events Calendar', icon: 'fa-calendar-days', desc: 'Global exams, conferences & fairs' },
-            { id: 'futureprediction', label: 'Future Prediction AI', icon: 'fa-crystal-ball', desc: 'Market demand & career simulation' },
+        'Market Intelligence': [
+            { id: 'futureprediction', label: 'Trends Predator AI', icon: 'fa-crystal-ball', desc: '150+ Market Shifts' },
+            { id: 'career/jobs', label: 'Global Job Portals', icon: 'fa-globe-americas', desc: 'LinkedIn, Indeed & 20+ more' },
+            { id: 'events', label: 'Events & Expo Hub', icon: 'fa-calendar-check', desc: 'Conferences & Career fairs' },
+            { id: 'resources', label: 'Digital Library', icon: 'fa-folder-open', desc: 'Research & Assets vault' },
         ]
     };
 
     const mainLinks = [
-        { id: 'community', label: 'Community' },
-        { id: 'mentorship', label: 'Mentorship & Mentor' },
+        { id: 'community', label: 'Community Hub' },
+        { id: 'mentorship', label: 'Mentor & Mentorship', isHighlighted: true },
+        { id: 'learning/labs', label: 'Skill Labs', isLabsHighlight: true },
         { id: 'games', label: 'Games' },
         { id: 'learning/chatbot', label: 'AI Chatbot', isSpecial: true },
-        { id: 'contact', label: 'Contact' }
+        { id: 'contact', label: 'Contact Support' }
     ];
 
     const [notifications, setNotifications] = useState([]);
@@ -146,7 +136,7 @@ const Header = ({
         const fetchNotifs = async () => {
             try {
                 const auth = JSON.parse(localStorage.getItem('auth'));
-                if (!auth) return;
+                if (!auth || !auth.token) return;
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/v1/notifications`, {
                     headers: { 'Authorization': `Bearer ${auth.token}` }
                 });
@@ -169,7 +159,6 @@ const Header = ({
         };
 
         fetchNotifs();
-        // Refresh every 30 seconds for real-time feel
         const interval = setInterval(fetchNotifs, 30000);
         return () => clearInterval(interval);
     }, []);
@@ -189,7 +178,6 @@ const Header = ({
         }
     };
 
-    // ─── Minimal Mode ───────────────────────────────────────────────────
     const minimalNavModes = ['escapechallenge', 'aisurvivalclimb', 'codeescapehouse', 'elearning', 'multiplayer'];
     const isMinimal = minimalNavModes.includes(activeTab);
 
@@ -229,48 +217,90 @@ const Header = ({
 
                 {/* ── CENTER: Nav Links (Desktop) ──────────────── */}
                 <nav className="unav-links">
-                    {/* Solutions Megamenu — stable hover with delay timers */}
                     <div
                         ref={megaWrapRef}
                         className="unav-dropdown-wrap"
                         onMouseEnter={openMegamenu}
                         onMouseLeave={closeMegamenu}
-                        style={{ position: 'relative' }}
                     >
                         <button
                             className={`unav-link-btn ${megamenuOpen ? 'active' : ''}`}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                setMegamenuOpen(!megamenuOpen);
-                            }}
+                            onClick={() => setMegamenuOpen(!megamenuOpen)}
                         >
                             Solutions <ChevronDown size={13} className={megamenuOpen ? 'rotated' : ''} />
                         </button>
+                    </div>
 
-                        {/* Invisible bridge: fills gap between button bottom and menu top */}
-                        {megamenuOpen && (
-                            <div
-                                style={{ position: 'absolute', top: '100%', left: 0, right: 0, height: '8px', zIndex: 199 }}
-                                onMouseEnter={cancelClose}
-                                onMouseLeave={closeMegamenu}
-                            />
-                        )}
+                    {mainLinks.map(link => (
+                        <button
+                            key={link.id}
+                            onClick={() => setActiveTab(link.id)}
+                            className={`unav-link-btn ${link.isSpecial ? 'special' : ''} ${link.isHighlighted ? 'mentorship-highlight' : ''} ${link.isLabsHighlight ? 'labs-highlight' : ''} ${activeTab === link.id ? 'active' : ''}`}
+                        >
+                            {link.isSpecial && <i className="fa-solid fa-sparkles" style={{ marginRight: '5px' }} />}
+                            {link.label}
+                        </button>
+                    ))}
+                </nav>
 
-                        {megamenuOpen && (
-                            <div
-                                className="unav-megamenu"
-                                style={{ animation: 'megaSlideIn 0.2s cubic-bezier(0.16,1,0.3,1) forwards' }}
-                                onMouseEnter={cancelClose}
-                                onMouseLeave={closeMegamenu}
-                            >
-                                {Object.keys(solutionsMenu).map((cat, i) => (
-                                    <div key={i} className="unav-mega-col">
+                <AnimatePresence>
+                    {megamenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="unav-megamenu"
+                            onMouseEnter={cancelClose}
+                            onMouseLeave={closeMegamenu}
+                        >
+
+                            {/* Trends Search Bar */}
+                            <div style={{ background: '#ffffff', padding: '1.25rem 3rem', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                                <div style={{ flex: 1, position: 'relative' }}>
+                                    <i className="fa-solid fa-magnifying-glass" style={{ position: 'absolute', left: '20px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                                    <input
+                                        type="text"
+                                        placeholder="Search 150+ domains... (e.g. BioTech, Quantum, AI)"
+                                        style={{
+                                            width: '100%',
+                                            padding: '14px 20px 14px 55px',
+                                            background: '#ffffff',
+                                            border: '1.5px solid #e2e8f0',
+                                            borderRadius: '14px',
+                                            fontSize: '1rem',
+                                            outline: 'none'
+                                        }}
+                                        onFocus={() => { setActiveTab('futureprediction'); setMegamenuOpen(false); }}
+                                    />
+                                </div>
+                                <span style={{ fontWeight: 850, fontSize: '0.75rem', color: '#6366f1', letterSpacing: '1px' }}>PREDATOR ENGINE ENABLED</span>
+                            </div>
+
+                            {/* Grid Content */}
+                            <div style={{
+                                padding: '4rem 6rem',
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(3, 1fr)',
+                                gap: '5rem',
+                                flex: 1,
+                                background: '#ffffff'
+                            }}>
+                                {Object.keys(solutionsMenu).map((cat) => (
+                                    <div key={cat} className="unav-mega-col">
                                         <h4 className="unav-mega-cat">{cat}</h4>
-                                        {solutionsMenu[cat].map(item => (
+                                        {solutionsMenu[cat].map((item, j) => (
                                             <div
-                                                key={item.id}
-                                                className="unav-mega-item hover-3d"
-                                                onClick={() => { setActiveTab(item.id); setMegamenuOpen(false); }}
+                                                key={`${cat}-${item.id}-${j}`}
+                                                className={`unav-mega-item hover-3d ${item.isPremium ? 'premium-rec' : ''}`}
+                                                style={item.isPremium ? {
+                                                    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%)',
+                                                    border: '1px solid rgba(168, 85, 247, 0.2)'
+                                                } : {}}
+                                                onClick={() => {
+                                                    if (item.id.startsWith('http')) window.open(item.id, '_blank');
+                                                    else setActiveTab(item.id);
+                                                    setMegamenuOpen(false);
+                                                }}
                                             >
                                                 <div className="unav-mega-icon">
                                                     <i className={`fa-solid ${item.icon}`} />
@@ -284,26 +314,11 @@ const Header = ({
                                     </div>
                                 ))}
                             </div>
-                        )}
-                    </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                    {/* Direct Links */}
-                    {mainLinks.map(link => (
-                        <button
-                            key={link.id}
-                            onClick={() => setActiveTab(link.id)}
-                            className={`unav-link-btn ${link.isSpecial ? 'special' : ''} ${activeTab === link.id ? 'active' : ''}`}
-                        >
-                            {link.isSpecial && <i className="fa-solid fa-sparkles" style={{ marginRight: '5px' }} />}
-                            {link.label}
-                        </button>
-                    ))}
-                </nav>
-
-                {/* ── RIGHT: Control Panel ─────────────────────── */}
                 <div className="unav-controls">
-
-                    {/* XP Stats Pill */}
                     <div className="unav-stats-pill">
                         <span className="unav-lvl">LVL {userLevel}</span>
                         <div className="unav-xp-bar">
@@ -312,14 +327,12 @@ const Header = ({
                         <span className="unav-coins"><i className="fa-solid fa-coins" /> {(userCoins || 0).toLocaleString()}</span>
                     </div>
 
-                    {/* Upload Knowledge Base */}
                     <label className="unav-icon-btn tooltip-wrapper" title="Supply Context">
                         <i className={`fa-solid ${isUploading ? 'fa-spinner fa-spin' : 'fa-file-arrow-up'}`} />
                         <input type="file" accept=".txt,.md,.json,.csv" style={{ display: 'none' }} onChange={handleFileUpload} />
                         <span className="unav-tooltip">Supply Context</span>
                     </label>
 
-                    {/* Search */}
                     <div className={`unav-search-wrap ${searchExpanded ? 'expanded' : ''}`} ref={searchRef}>
                         <button className="unav-icon-btn" onClick={handleSearchToggle} title="Search">
                             <i className="fa-solid fa-magnifying-glass" />
@@ -341,7 +354,6 @@ const Header = ({
                         </div>
                     </div>
 
-                    {/* Notifications */}
                     <div className="unav-dropdown-anchor" ref={notificationsRef}>
                         <button
                             className={`unav-icon-btn notif-btn ${showNotifications ? 'active' : ''}`}
@@ -385,7 +397,6 @@ const Header = ({
                         )}
                     </div>
 
-                    {/* Microphone */}
                     <button
                         className={`unav-icon-btn mic-btn ${isRecording ? 'recording' : ''}`}
                         onClick={handleVoiceToggle}
@@ -394,7 +405,6 @@ const Header = ({
                         <i className={`fa-solid ${isRecording ? 'fa-stop fa-beat' : 'fa-microphone'}`} />
                     </button>
 
-                    {/* Fullscreen */}
                     <button
                         className={`unav-icon-btn ${isFullscreen ? 'active' : ''}`}
                         onClick={toggleGlobalFullscreen}
@@ -403,7 +413,6 @@ const Header = ({
                         <i className={`fa-solid ${isFullscreen ? 'fa-compress' : 'fa-expand'}`} />
                     </button>
 
-                    {/* Profile */}
                     <div className="unav-dropdown-anchor" ref={profileMenuRef}>
                         <div
                             className="unav-profile-trigger"
@@ -456,14 +465,12 @@ const Header = ({
                         )}
                     </div>
 
-                    {/* Mobile Hamburger */}
                     <button className="unav-hamburger" onClick={() => setMobileMenuOpen(p => !p)}>
                         {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
                     </button>
                 </div>
             </div>
 
-            {/* ── Mobile Menu ─────────────────────────────────── */}
             {mobileMenuOpen && (
                 <div className="unav-mobile-menu slide-down">
                     <p className="unav-mobile-cat">Solutions</p>

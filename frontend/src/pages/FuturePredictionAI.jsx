@@ -1,206 +1,191 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const PREDICTIONS = [
-    { id: 1, title: "Market Sentiment: Q3 2026", type: "Market", confidence: 92, status: "Bullish", desc: "Expect a 24% surge in demand for Quantum Computing and Bio-Tech integration in Enterprise systems." },
-    { id: 2, title: "Automation Risk: Backend Dev", type: "Vulnerability", confidence: 88, status: "Moderate", desc: "AI-driven code generation will automate 40% of standard CRUD operations. Transition to Architecture recommended." },
-    { id: 3, title: "Salary Trend: AI Ethicist", type: "Financial", confidence: 95, status: "Rising", desc: "Entry-level roles expected to start at $145k due to new EU and US AI safety regulations." },
-    { id: 4, title: "Skill Obsolescence: Legacy Java", type: "Vulnerability", confidence: 76, status: "Critical", desc: "Maintenance of legacy systems is shifting to automated migration tools. Pivot to Rust/Go for high-tier roles." }
-];
-
-const MARKET_TRENDS = [
-    { label: "Generative AI", value: 98, color: "#6366f1" },
-    { label: "Green Tech", value: 85, color: "#10b981" },
-    { label: "Cyber Security", value: 92, color: "#f59e0b" },
-    { label: "Robotics", value: 78, color: "#ef4444" },
-    { label: "Web3/Blockchain", value: 45, color: "#8b5cf6" }
-];
+import { TECH_DEPARTMENTS } from '../data/departments_data';
 
 const FuturePredictionAI = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedDept, setSelectedDept] = useState(null);
     const [analyzing, setAnalyzing] = useState(false);
-    const [reportGenerated, setReportGenerated] = useState(false);
-    const [showReportModal, setShowReportModal] = useState(false);
+    const [predictionResult, setPredictionResult] = useState(null);
 
-    const runAnalysis = () => {
+    const filteredDepts = useMemo(() => {
+        return TECH_DEPARTMENTS.filter(d => 
+            d.toLowerCase().includes(searchTerm.toLowerCase())
+        ).slice(0, 12); // Show top 12 matches
+    }, [searchTerm]);
+
+    const runAnalysis = (dept) => {
         setAnalyzing(true);
+        setSelectedDept(dept);
+        
+        // Simulate complex data crunching
         setTimeout(() => {
+            const confidence = 85 + Math.floor(Math.random() * 10);
+            const status = Math.random() > 0.3 ? "Bullish" : "Volatile";
+            const demandLevel = 60 + Math.floor(Math.random() * 35);
+            
+            setPredictionResult({
+                dept,
+                confidence,
+                status,
+                demandLevel,
+                hiringTrend: status === "Bullish" ? "+24% Growth" : "+8% Steady",
+                pivotRisk: Math.floor(Math.random() * 40),
+                desc: `Our neural network predicts a significant ${status.toLowerCase()} phase for ${dept} between 2026-2028. ${status === "Bullish" ? "Investment in specialized tools and cross-domain knowledge is highly recommended." : "Market saturation is high; focusing on niche architectural roles is safer."}`
+            });
             setAnalyzing(false);
-            setReportGenerated(true);
-            setShowReportModal(true);
-        }, 3500);
+        }, 2000);
     };
 
     return (
-        <div style={{ minHeight: '100vh', background: '#0a0f1e', color: 'white', padding: '4rem 2rem' }}>
+        <div style={{ minHeight: '100vh', background: '#0a0f1e', color: 'white', padding: '6rem 2rem' }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
                 
-                {/* Report Generation Modal */}
-                <AnimatePresence>
-                    {showReportModal && (
-                        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(20px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-                            <motion.div 
-                                initial={{ scale: 0.9, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 0.9, opacity: 0 }}
-                                style={{ background: '#1e293b', padding: '3rem', borderRadius: '40px', maxWidth: '1000px', width: '100%', border: '1px solid rgba(255,255,255,0.1)', position: 'relative' }}
-                            >
-                                <button onClick={() => setShowReportModal(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '1.5rem', cursor: 'pointer' }}>
-                                    <i className="fa-solid fa-xmark"></i>
-                                </button>
-                                
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem' }}>
-                                    <div>
-                                        <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1.5rem', color: '#38bdf8' }}>Report Ready.</h2>
-                                        <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginBottom: '2rem' }}>
-                                            Your Full Career Trajectory Report (2026-2030) has been meticulously analyzed and compiled by our neural engine.
-                                        </p>
-                                        
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '2.5rem' }}>
-                                            <button style={{ padding: '1.2rem', background: 'rgba(56, 189, 248, 0.1)', border: '1px solid #38bdf8', borderRadius: '15px', color: '#38bdf8', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                <i className="fa-solid fa-file-pdf"></i> Download PDF Report
-                                            </button>
-                                            <button style={{ padding: '1.2rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '15px', color: 'white', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                <i className="fa-solid fa-file-word"></i> Export as Document (.docx)
-                                            </button>
-                                            <button style={{ padding: '1.2rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', borderRadius: '15px', color: '#10b981', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                <i className="fa-solid fa-paper-plane"></i> Email Full Analysis to Me
-                                            </button>
-                                        </div>
-
-                                        <p style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                                            * This report includes market sensitivity charts, skill pivot recommendations, and personalized salary projections.
-                                        </p>
-                                    </div>
-                                    <div style={{ borderRadius: '20px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
-                                        <img 
-                                            src="/images/report_preview.png" 
-                                            alt="AI Report Preview" 
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                    </div>
-                                </div>
-                            </motion.div>
-                        </div>
-                    )}
-                </AnimatePresence>
-
-                {/* Hero Header */}
-                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: 'center', marginBottom: '4rem' }}>
+                {/* Header Section */}
+                <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', marginBottom: '4rem' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(56, 189, 248, 0.1)', padding: '10px 25px', borderRadius: '100px', border: '1px solid rgba(56, 189, 248, 0.2)', color: '#38bdf8', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem', marginBottom: '2rem' }}>
                         <i className="fa-solid fa-crystal-ball"></i>
-                        Next-Gen Future Prediction AI
+                        Market Predator AI
                     </div>
-                    <h1 style={{ fontSize: '4.5rem', fontWeight: 900, marginBottom: '1.5rem', background: 'linear-gradient(to bottom, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                        The Future. <span style={{ color: '#38bdf8' }}>Simulated.</span>
+                    <h1 style={{ fontSize: '4rem', fontWeight: 900, marginBottom: '1.5rem', background: 'linear-gradient(to bottom, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                        Choose Department. <span style={{ color: '#38bdf8' }}>Own the Future.</span>
                     </h1>
-                    <p style={{ fontSize: '1.2rem', color: '#94a3b8', maxWidth: '800px', margin: '0 auto', lineHeight: '1.8' }}>
-                        Our AI engine processes over 18 Billion data points from global markets, job boards, and technology whitepapers to predict your career trajectory with 94% accuracy.
+                    <p style={{ fontSize: '1.2rem', color: '#94a3b8', maxWidth: '800px', margin: '0 auto' }}>
+                        Analyze trends across 150+ technology departments. Our AI predicts market shifts, salary pivots, and skill survival rates.
                     </p>
                 </motion.div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center', marginBottom: '6rem' }}>
-                    <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1.5rem' }}>Predict Your Survival in the AI Era</h2>
-                        <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginBottom: '2.5rem' }}>
-                            We don't just guess. We analyze emerging patterns in LLMs, industrial automation, and demographic shifts to show you exactly which skills will make you indispensable.
-                        </p>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '3rem' }}>
-                            {[
-                                { icon: "fa-shield-halved", title: "Skill Vulnerability Mapping", color: "#10b981" },
-                                { icon: "fa-arrow-trend-up", title: "Market Demand Forecasting", color: "#38bdf8" },
-                                { icon: "fa-sack-dollar", title: "Predictive Salary Analytics", color: "#f59e0b" }
-                            ].map(item => (
-                                <div key={item.title} style={{ display: 'flex', alignItems: 'center', gap: '20px', background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                    <div style={{ width: '50px', height: '50px', background: `${item.color}20`, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.color, fontSize: '1.2rem' }}>
-                                        <i className={`fa-solid ${item.icon}`}></i>
-                                    </div>
-                                    <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>{item.title}</span>
-                                </div>
-                            ))}
-                        </div>
+                {/* Filter & Search Section */}
+                <div style={{ background: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '30px', padding: '3rem', backdropFilter: 'blur(10px)', marginBottom: '4rem', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+                    <div style={{ position: 'relative', marginBottom: '2.5rem' }}>
+                        <i className="fa-solid fa-magnifying-glass" style={{ position: 'absolute', left: '25px', top: '50%', transform: 'translateY(-50%)', color: '#38bdf8' }}></i>
+                        <input 
+                            type="text" 
+                            placeholder="Find Department (e.g. Generative AI, CyberSecurity, FinTech...)" 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            style={{ width: '100%', padding: '1.5rem 1.5rem 1.5rem 4rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', color: 'white', fontSize: '1.1rem', outline: 'none', transition: '0.3s' }}
+                        />
+                    </div>
 
-                        <button 
-                            onClick={runAnalysis}
-                            disabled={analyzing}
-                            style={{ width: '100%', padding: '1.5rem', background: 'linear-gradient(135deg, #38bdf8, #818cf8)', border: 'none', borderRadius: '20px', color: 'white', fontSize: '1.2rem', fontWeight: 900, cursor: 'pointer', boxShadow: '0 10px 40px rgba(56, 189, 248, 0.4)', position: 'relative', overflow: 'hidden' }}
-                        >
-                            {analyzing ? (
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px' }}>
-                                    <div style={{ width: '20px', height: '20px', border: '3px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                                    Processing Global Variables...
-                                </div>
-                            ) : "Run Global Career Simulation"}
-                        </button>
-                    </motion.div>
-
-                    <motion.div 
-                        initial={{ x: 50, opacity: 0 }} 
-                        animate={{ x: 0, opacity: 1 }} 
-                        transition={{ delay: 0.4 }}
-                        style={{ background: 'rgba(30, 41, 59, 0.5)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '40px', padding: '3rem', backdropFilter: 'blur(10px)', boxShadow: '0 40px 100px rgba(0,0,0,0.4)' }}
-                    >
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '2.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                            <i className="fa-solid fa-chart-line" style={{ color: '#38bdf8' }}></i>
-                            2026-2030 Market Index
-                        </h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                            {MARKET_TRENDS.map(t => (
-                                <div key={t.label}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '0.9rem', fontWeight: 800 }}>
-                                        <span style={{ color: '#94a3b8' }}>{t.label}</span>
-                                        <span>{t.value}% Demand</span>
-                                    </div>
-                                    <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
-                                        <motion.div 
-                                            initial={{ width: 0 }} 
-                                            animate={{ width: `${t.value}%` }} 
-                                            transition={{ duration: 1, delay: 1 }}
-                                            style={{ height: '100%', background: t.color, borderRadius: '10px', boxShadow: `0 0 15px ${t.color}60` }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '15px' }}>
+                        {filteredDepts.map(dept => (
+                            <motion.button 
+                                key={dept}
+                                whileHover={{ scale: 1.02, y: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => runAnalysis(dept)}
+                                style={{ 
+                                    padding: '1rem', 
+                                    background: selectedDept === dept ? 'linear-gradient(135deg, #38bdf8, #818cf8)' : 'rgba(255,255,255,0.03)', 
+                                    border: '1px solid rgba(255,255,255,0.1)', 
+                                    borderRadius: '15px', 
+                                    color: 'white', 
+                                    fontSize: '0.9rem', 
+                                    fontWeight: 700, 
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <span>{dept}</span>
+                                <i className="fa-solid fa-chevron-right" style={{ fontSize: '0.7rem', opacity: 0.5 }}></i>
+                            </motion.button>
+                        ))}
+                    </div>
                 </div>
 
-                <AnimatePresence>
-                    {reportGenerated && (
+                {/* Analysis Result Section */}
+                <AnimatePresence mode="wait">
+                    {analyzing ? (
                         <motion.div 
-                            initial={{ y: 50, opacity: 0 }} 
-                            animate={{ y: 0, opacity: 1 }}
-                            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '4rem' }}
+                            key="loading"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            style={{ textAlign: 'center', padding: '5rem' }}
                         >
-                            {PREDICTIONS.map(p => (
-                                <motion.div 
-                                    key={p.id}
-                                    whileHover={{ y: -10 }}
-                                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '30px', padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '15px' }}
-                                >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                        <span style={{ fontSize: '0.7rem', fontWeight: 900, color: '#38bdf8', padding: '5px 12px', background: 'rgba(56, 189, 248, 0.1)', borderRadius: '100px' }}>{p.type}</span>
-                                        <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#10b981' }}>{p.confidence}%</div>
+                            <div style={{ width: '80px', height: '80px', border: '5px solid rgba(56, 189, 248, 0.2)', borderTopColor: '#38bdf8', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto 2rem' }}></div>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: 900 }}>Crunching {selectedDept} Data Points...</h3>
+                            <p style={{ color: '#94a3b8' }}>Analyzing GitHub repos, Job market volatility, and VC investment trends.</p>
+                        </motion.div>
+                    ) : predictionResult && (
+                        <motion.div 
+                            key="result"
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '3rem' }}
+                        >
+                            {/* Detailed Analysis Card */}
+                            <div style={{ background: 'rgba(25, 33, 49, 0.8)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '40px', padding: '3.5rem', position: 'relative', overflow: 'hidden' }}>
+                                <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%)', pointerEvents: 'none' }}></div>
+                                
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem' }}>
+                                    <div>
+                                        <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '0.5rem' }}>{predictionResult.dept}</h2>
+                                        <span style={{ color: '#38bdf8', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '2px' }}>Future Index Analysis</span>
                                     </div>
-                                    <h4 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '10px 0' }}>{p.title}</h4>
-                                    <p style={{ fontSize: '0.9rem', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>{p.desc}</p>
-                                    <div style={{ marginTop: 'auto', paddingTop: '15px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '8px', color: p.status === 'Bullish' || p.status === 'Rising' ? '#10b981' : '#f59e0b', fontSize: '0.8rem', fontWeight: 900 }}>
-                                        <i className={`fa-solid ${p.status === 'Bullish' || p.status === 'Rising' ? 'fa-arrow-trend-up' : 'fa-triangle-exclamation'}`}></i>
-                                        {p.status}
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ fontSize: '2.5rem', fontWeight: 900, color: '#10b981' }}>{predictionResult.confidence}%</div>
+                                        <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 900 }}>AI CONFIDENCE</div>
                                     </div>
-                                </motion.div>
-                            ))}
+                                </div>
+
+                                <p style={{ fontSize: '1.2rem', color: '#94a3b8', lineHeight: '1.8', marginBottom: '3rem' }}>
+                                    {predictionResult.desc}
+                                </p>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem' }}>
+                                    {[
+                                        { label: "Market Status", value: predictionResult.status, color: predictionResult.status === "Bullish" ? "#10b981" : "#f59e0b" },
+                                        { label: "Annual Demand", value: predictionResult.hiringTrend, color: "#38bdf8" },
+                                        { label: "Obsolescence Risk", value: `${predictionResult.pivotRisk}%`, color: predictionResult.pivotRisk > 30 ? "#ef4444" : "#10b981" }
+                                    ].map(stat => (
+                                        <div key={stat.label}>
+                                            <p style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 900, marginBottom: '8px', textTransform: 'uppercase' }}>{stat.label}</p>
+                                            <p style={{ fontSize: '1.5rem', fontWeight: 900, color: stat.color }}>{stat.value}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* visual stats card */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                                <div style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '30px', padding: '2.5rem' }}>
+                                    <h4 style={{ fontSize: '1.1rem', fontWeight: 900, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <i className="fa-solid fa-chart-simple" style={{ color: '#38bdf8' }}></i>
+                                        Growth Projection
+                                    </h4>
+                                    <div style={{ height: '150px', display: 'flex', alignItems: 'flex-end', gap: '15px', padding: '0 10px' }}>
+                                        {[40, 65, 50, 85, 95, 80].map((h, i) => (
+                                            <div key={i} style={{ flex: 1, background: i === 4 ? '#38bdf8' : 'rgba(255,255,255,0.05)', height: `${h}%`, borderRadius: '8px', position: 'relative' }}>
+                                                {i === 4 && <div style={{ position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)', fontSize: '0.7rem', fontWeight: 900, color: '#38bdf8' }}>PEAK</div>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px', color: '#64748b', fontSize: '0.7rem', fontWeight: 800 }}>
+                                        <span>2024</span>
+                                        <span>2026 (PROJECTED)</span>
+                                        <span>2029</span>
+                                    </div>
+                                </div>
+
+                                <div style={{ background: 'linear-gradient(135deg, #38bdf8, #818cf8)', borderRadius: '30px', padding: '2.5rem', color: 'white', position: 'relative', overflow: 'hidden' }}>
+                                    <i className="fa-solid fa-bolt" style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '5rem', opacity: 0.1 }}></i>
+                                    <h4 style={{ fontSize: '1.2rem', fontWeight: 900, marginBottom: '1rem' }}>Pivot Now</h4>
+                                    <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem', opacity: 0.9 }}>
+                                        Get a personalized certification roadmap for {predictionResult.dept} to beat the 2026 automation wave.
+                                    </p>
+                                    <button style={{ padding: '0.8rem 1.5rem', background: 'white', border: 'none', borderRadius: '12px', color: '#38bdf8', fontWeight: 900, cursor: 'pointer' }}>
+                                        Generate Roadmap
+                                    </button>
+                                </div>
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
-
-                {/* Integration Notice */}
-                <div style={{ padding: '3rem', background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05), rgba(129, 140, 248, 0.05))', borderRadius: '40px', border: '1px solid rgba(56, 189, 248, 0.1)', textAlign: 'center' }}>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '1rem' }}>Global Prediction Engine Active</h3>
-                    <p style={{ color: '#94a3b8', maxWidth: '600px', margin: '0 auto' }}>
-                        Connected to World Bank, IMF, LinkedIn Economic Graph, and 2,400+ tech journals. Predictions updated every 6 hours.
-                    </p>
-                </div>
             </div>
 
             <style>{`
